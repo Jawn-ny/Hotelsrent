@@ -1,3 +1,6 @@
+import json
+import os
+
 def show_menu():
     print("\n=====ShouSi's house=====")
     print("1. 添加支出")
@@ -14,7 +17,7 @@ def main():
         choice = input("请选择功能：")
 
         if choice == "1":
-            print("你选择了：添加支出")
+            add_expense()
         elif choice == "2":
             print("你选择了：查看所有支出")
         elif choice == "3":
@@ -29,6 +32,37 @@ def main():
         else:
             print("输入错误，请输入 0 到 5")
 
+def add_expense():
+    date = input("请输入日期，例如 2026-07-11：")
+    item = input("请输入物品名称：")
+    amount = input("请输入金额：")
+    category = input("请输入分类，例如 食品、交通、日用品：")
+    payer = input("请输入付款人：")
+    note = input("请输入备注，没有可直接回车：")
+
+    expense = {
+        "date": date,
+        "item": item,
+        "amount": amount,
+        "category": category,
+        "payer": payer,
+        "note": note
+    }
+
+    file_path = "data/expenses.json"
+
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as file:
+            expenses = json.load(file)
+    else:
+        expenses = []
+
+    expenses.append(expense)
+
+    with open(file_path, "w", encoding="utf-8") as file:
+        json.dump(expenses, file, ensure_ascii=False, indent=4)
+
+    print("支出添加成功！")
 
 if __name__ == "__main__":
     main()
