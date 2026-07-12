@@ -1,5 +1,9 @@
-# my cat's name is ShouSi
-hello,today is first day
-## Because I like eat ShouSi
-### Actually it's name was XiaoYu before we bought it from cat hotel
-#### I like it very much
+# 寿司小屋的租房记账程序
+本程序基于租房需求，可用于多场景的记账，选择不同的功能反馈不同的界面用于帮助你更好的记录每一笔支出
+## 基础功能
+1.添加一笔支出(日期、物品、金额、分类、付款人、备注。);
+2.查看所有支出记录;
+3.按月份统计总支出;
+4.按分类统计支出;
+5.按付款人统计支出;
+### 下面根据不同的功能进行介绍

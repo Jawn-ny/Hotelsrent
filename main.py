@@ -21,7 +21,7 @@ def main():
         elif choice == "2":
             list_expense()
         elif choice == "3":
-            print("你选择了：按月份统计")
+            summary_by_month()
         elif choice == "4":
             print("你选择了：按分类统计")
         elif choice == "5":
@@ -81,8 +81,34 @@ def list_expense():
         print("分类：", expense["category"])
         print("付款人：", expense["payer"])
         print("备注：", expense["note"])
-        print("--------------------")
+        print("-----------------")
 
+def summary_by_month():
+    month = input("请输入月份，例如 2026-07：")
+
+    file_path = "data/expenses.json"
+
+    if not os.path.exists(file_path):
+        print("暂无支出记录")
+        return
+
+    with open(file_path, "r", encoding="utf-8") as file:
+        expenses = json.load(file)
+
+    if not expenses:
+        print("暂无支出记录")
+        return
+
+    total = 0
+    count = 0
+    for expense in expenses:
+        if expense["date"].startswith(month):
+            total += float(expense["amount"])
+            count += 1
+    if count == 0:
+        print("该月份暂无支出记录")
+    else:
+        print(f"{month} 的总支出为：{total:.2f} 元")
 
 if __name__ == "__main__":
     main()
