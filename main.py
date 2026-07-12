@@ -19,7 +19,7 @@ def main():
         if choice == "1":
             add_expense()
         elif choice == "2":
-            print("你选择了：查看所有支出")
+            list_expense()
         elif choice == "3":
             print("你选择了：按月份统计")
         elif choice == "4":
@@ -63,6 +63,26 @@ def add_expense():
         json.dump(expenses, file, ensure_ascii=False, indent=4)
 
     print("支出添加成功！")
+
+def list_expense():
+    file_path = "data/expenses.json"
+
+    with open(file_path, "r", encoding="utf-8") as file:
+        expenses = json.load(file)
+    
+    if not os.path.exists(file_path):
+        print("没有支出可以查询")
+        return
+    
+    for expense in expenses:
+        print("日期：", expense["date"])
+        print("物品：", expense["item"])
+        print("金额：", expense["amount"])
+        print("分类：", expense["category"])
+        print("付款人：", expense["payer"])
+        print("备注：", expense["note"])
+        print("--------------------")
+
 
 if __name__ == "__main__":
     main()
