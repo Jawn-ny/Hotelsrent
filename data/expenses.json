@@ -22,5 +22,29 @@
         "category": "饮品",
         "payer": "不知道",
         "note": ""
+    },
+    {
+        "date": "2026-7-14",
+        "item": "食材",
+        "amount": 55.0,
+        "category": "食材",
+        "payer": "泷曦",
+        "note": ""
+    },
+    {
+        "date": "2026-7-14",
+        "item": "小猫寿司的玩具",
+        "amount": 50.0,
+        "category": "猫用品",
+        "payer": "泷曦",
+        "note": ""
+    },
+    {
+        "date": "2026-7-14",
+        "item": "黑糖牛乳烤黑糖啵啵和椰椰芒芒",
+        "amount": 30.0,
+        "category": "饮品",
+        "payer": "不知道",
+        "note": ""
     }
 ]

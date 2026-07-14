@@ -35,7 +35,20 @@ def main():
 def add_expense():
     date = input("请输入日期，例如 2026-07-11：")
     item = input("请输入物品名称：")
-    amount = input("请输入金额：")
+    while True:
+        amount = input("请输入金额：").strip()
+
+        try:
+            amount = float(amount)
+        except ValueError:
+            print("请输入正确数字！")
+            continue
+
+        if amount <= 0:
+            print("金额必须大于0")
+            continue
+        
+        break
     category = input("请输入分类，例如 食品、交通、日用品：")
     payer = input("请输入付款人：")
     note = input("请输入备注，没有可直接回车：")
@@ -52,8 +65,12 @@ def add_expense():
     file_path = "data/expenses.json"
 
     if os.path.exists(file_path):
-        with open(file_path, "r", encoding="utf-8") as file:
-            expenses = json.load(file)
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                expenses = json.load(file)
+        except json.JSONDecodeError:
+            print("数据文件为空或格式损坏，将从空记录开始。")
+            expenses = []
     else:
         expenses = []
 
@@ -67,12 +84,12 @@ def add_expense():
 def list_expense():
     file_path = "data/expenses.json"
 
-    with open(file_path, "r", encoding="utf-8") as file:
-        expenses = json.load(file)
-    
     if not os.path.exists(file_path):
         print("没有支出可以查询")
         return
+    
+    with open(file_path, "r", encoding="utf-8") as file:
+        expenses = json.load(file)
     
     for expense in expenses:
         print("日期：", expense["date"])
@@ -92,8 +109,12 @@ def summary_by_month():
         print("暂无支出记录")
         return
 
-    with open(file_path, "r", encoding="utf-8") as file:
-        expenses = json.load(file)
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            expenses = json.load(file)
+    except json.JSONDecodeError:
+        print("数据文件为空或格式损坏，无法进行月份统计。")
+        return
 
     if not expenses:
         print("暂无支出记录")
@@ -172,3 +193,4 @@ def summary_by_payer():
 
 if __name__ == "__main__":
     main()
+
