@@ -25,7 +25,7 @@ def main():
         elif choice == "4":
             summary_by_category()
         elif choice == "5":
-            print("你选择了：按付款人统计")
+            summary_by_payer()
         elif choice == "0":
             print("程序已退出")
             break
@@ -111,6 +111,7 @@ def summary_by_month():
         print(f"{month} 的总支出为：{total:.2f} 元")
 
 def summary_by_category():
+
     file_path = "data/expenses.json"
 
     if not os.path.exists(file_path):
@@ -137,6 +138,37 @@ def summary_by_category():
 
     for category, total in category_totals.items():
         print(f"{category}：{total:.2f} 元")
+
+def summary_by_payer():
+
+    file_path = "data/expenses.json"
+
+    if not os.path.exists(file_path):
+        print("暂无支出记录")
+        return
+    
+    with open(file_path,"r",encoding="utf-8") as file:
+        expenses = json.load(file)
+
+    if not expenses :
+        print("暂无支出记录")
+        return
+    
+    payer_totals = {}
+
+    for expense in expenses:
+        payer = expense["payer"]
+        amount = float(expense["amount"])
+
+        if payer in payer_totals:
+            payer_totals[payer] += amount
+        else:
+            payer_totals[payer] = amount
+
+    print("======按付款人统计======")
+
+    for payer, total in payer_totals.items():
+        print(f"{payer}：{total:.2f} 元")
 
 if __name__ == "__main__":
     main()
