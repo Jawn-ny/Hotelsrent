@@ -64,6 +64,8 @@ def add_expense():
 
     file_path = "data/expenses.json"
 
+    os.makedirs("data", exist_ok=True)
+
     if os.path.exists(file_path):
         try:
             with open(file_path, "r", encoding="utf-8") as file:
@@ -83,13 +85,21 @@ def add_expense():
 
 def list_expense():
     file_path = "data/expenses.json"
-
+    
     if not os.path.exists(file_path):
         print("没有支出可以查询")
         return
     
-    with open(file_path, "r", encoding="utf-8") as file:
-        expenses = json.load(file)
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            expenses = json.load(file)
+    except json.JSONDecodeError:
+        print("数据文件为空或格式损坏，无法查看支出记录。")
+        return
+    
+    if not expenses:
+        print("没有支出可以查询")
+        return
     
     for expense in expenses:
         print("日期：", expense["date"])
@@ -139,8 +149,12 @@ def summary_by_category():
         print("暂无支出记录")
         return
 
-    with open(file_path, "r", encoding="utf-8") as file:
-        expenses = json.load(file)
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            expenses = json.load(file)
+    except json.JSONDecodeError:
+        print("数据文件为空或格式损坏，无法查看支出记录。")
+        return
 
     if not expenses:
         print("暂无支出记录")
@@ -168,8 +182,12 @@ def summary_by_payer():
         print("暂无支出记录")
         return
     
-    with open(file_path,"r",encoding="utf-8") as file:
-        expenses = json.load(file)
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            expenses = json.load(file)
+    except json.JSONDecodeError:
+        print("数据文件为空或格式损坏，无法查看支出记录。")
+        return
 
     if not expenses :
         print("暂无支出记录")

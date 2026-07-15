@@ -46,5 +46,13 @@
         "category": "饮品",
         "payer": "不知道",
         "note": ""
+    },
+    {
+        "date": "2026-7-15",
+        "item": "寿司",
+        "amount": 10.0,
+        "category": "食品",
+        "payer": "泷曦",
+        "note": ""
     }
 ]
