@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import os
 
@@ -14,12 +15,12 @@ def show_menu():
 def main():
     while True:
         show_menu()
-        choice = input("请选择功能：")
+        choice = input("请选择功能：").strip()
 
         if choice == "1":
             add_expense()
         elif choice == "2":
-            list_expense()
+            list_expenses()
         elif choice == "3":
             summary_by_month()
         elif choice == "4":
@@ -33,8 +34,16 @@ def main():
             print("输入错误，请输入 0 到 5")
 
 def add_expense():
-    date = input("请输入日期，例如 2026-07-11：")
-    item = input("请输入物品名称：")
+    while True:
+        date = input("请输入日期，例如 2026-07-11：").strip()
+        try:
+            datetime.strptime(date, "%Y-%m-%d")
+            break
+        except ValueError:
+            print("日期格式错误，请按照 YYYY-MM-DD 输入！")
+
+    item = input("请输入物品名称：").strip()
+
     while True:
         amount = input("请输入金额：").strip()
 
@@ -49,9 +58,9 @@ def add_expense():
             continue
         
         break
-    category = input("请输入分类，例如 食品、交通、日用品：")
-    payer = input("请输入付款人：")
-    note = input("请输入备注，没有可直接回车：")
+    category = input("请输入分类，例如 食品、交通、日用品：").strip()
+    payer = input("请输入付款人：").strip()
+    note = input("请输入备注，没有可直接回车：").strip()
 
     expense = {
         "date": date,
@@ -83,7 +92,7 @@ def add_expense():
 
     print("支出添加成功！")
 
-def list_expense():
+def list_expenses():
     file_path = "data/expenses.json"
     
     if not os.path.exists(file_path):
@@ -111,7 +120,14 @@ def list_expense():
         print("-----------------")
 
 def summary_by_month():
-    month = input("请输入月份，例如 2026-07：")
+    while True:
+        month = input("请输入月份，例如 2026-07：").strip()
+
+        try:
+            month = datetime.strptime(month, "%Y-%m").strftime("%Y-%m")
+            break
+        except ValueError:
+            print("月份格式错误，请按照 YYYY-MM 输入！")
 
     file_path = "data/expenses.json"
 
