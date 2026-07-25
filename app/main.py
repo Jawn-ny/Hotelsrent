@@ -1,12 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import json
 import os
 
 app = FastAPI()
-
 @app.get("/api/health")
 def health_check():
-    return {"status":"ok"}
+    return {"status": "ok"}
 
 def load_expenses():
 
@@ -22,4 +21,10 @@ def load_expenses():
 
 @app.get("/api/expenses")
 def get_expenses():
-    return load_expenses()
+    try:
+        return load_expenses()
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=500,
+            detail="Expense data file is invalid"
+        )
