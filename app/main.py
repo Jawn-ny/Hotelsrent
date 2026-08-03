@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from app.models import ExpenseCreate
 import json
 import os
 
@@ -19,7 +20,12 @@ def load_expenses():
 
     return expenses
 
-@app.get("/api/expenses")
+def save_expenses(expenses):
+    file_path = "data/expenses.json"
+
+    with open(file_path, "w", encoding="utf-8") as file:
+        json.dump(expenses, file, ensure_ascii=False, indent=4)
+
 def get_expenses():
     try:
         return load_expenses()
@@ -28,3 +34,12 @@ def get_expenses():
             status_code=500,
             detail="Expense data file is invalid"
         )
+    
+@app.post("/api/expenses", status_code=201)
+def create_expense(expense: ExpenseCreate):
+    expenses = load_expenses()
+    expense_data = expense.model_dump(mode="json")
+    expenses.append(expense_data)
+    save_expenses(expenses)
+    return expense_data
+

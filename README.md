@@ -14,3 +14,5 @@
 - 已完成命令行版租房生活记账工具
 - 已建立 FastAPI 开发环境
 - 已实现 `GET /api/health` 健康检查接口
+- 已实现 `GET /api/expenses`，可以读取并返回 JSON 文件中的全部支出。
+- 已处理支出 JSON 文件损坏时的 HTTP 错误响应。
