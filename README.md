@@ -16,3 +16,7 @@
 - 已实现 `GET /api/health` 健康检查接口
 - 已实现 `GET /api/expenses`，可以读取并返回 JSON 文件中的全部支出。
 - 已处理支出 JSON 文件损坏时的 HTTP 错误响应。
+- 已实现 `POST /api/expenses`，可验证并保存新支出到 JSON 文件。
+- 创建成功返回 `201 Created`。
+- 支出金额必须大于 0。
+- 物品名称不能为空，并会自动清除首尾空格。
