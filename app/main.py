@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from app.models import ExpenseCreate
 import json
 import os
@@ -26,6 +26,7 @@ def save_expenses(expenses):
     with open(file_path, "w", encoding="utf-8") as file:
         json.dump(expenses, file, ensure_ascii=False, indent=4)
 
+@app.get("/api/expenses")
 def get_expenses():
     try:
         return load_expenses()
@@ -43,3 +44,61 @@ def create_expense(expense: ExpenseCreate):
     save_expenses(expenses)
     return expense_data
 
+@app.get("/api/summary/month")
+def summary_by_month(
+    month: str = Query(
+        ...,
+        pattern=r"^\d{4}-(0[1-9]|1[0-2])$"
+    )
+):
+    expenses = load_expenses()
+
+    total = 0.0
+    count = 0
+
+    for expense in expenses:
+        if expense["date"].startswith(month):
+            total += float(expense["amount"])
+            count += 1
+
+    return {
+        "month": month,
+        "total": round(total, 2),
+        "count": count
+    }
+
+@app.get("/api/summary/category")
+def summary_by_category():
+    expenses = load_expenses()
+    totals = {}
+
+    for expense in expenses:
+        category = expense["category"]
+        amount = float(expense["amount"])
+
+        totals[category] = totals.get(category, 0.0) + amount
+
+    for category in totals:
+        totals[category] = round(totals[category], 2)
+
+    return {
+        "category_totals": totals
+    }
+
+@app.get("/api/summary/payer")
+def summary_by_payer():
+    expenses = load_expenses()
+    totals = {}
+
+    for expense in expenses:
+        payer = expense["payer"]
+        amount = float(expense["amount"])
+
+        totals[payer] = totals.get(payer, 0.0) + amount
+
+    for payer in totals:
+        totals[payer] = round(totals[payer], 2)
+
+    return {
+        "payer_totals": totals
+    }
