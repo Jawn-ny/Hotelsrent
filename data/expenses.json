@@ -54,5 +54,13 @@
         "category": "食品",
         "payer": "泷曦",
         "note": ""
+    },
+    {
+        "date": "2026-08-02",
+        "item": "木薯猫砂",
+        "amount": 28.8,
+        "category": "猫用品",
+        "payer": "泷曦",
+        "note": ""
     }
 ]
