@@ -1,9 +1,12 @@
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.models import ExpenseCreate
 import json
 import os
 
 app = FastAPI()
+app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 @app.get("/api/health")
 def health_check():
     return {"status": "ok"}
@@ -20,6 +23,15 @@ def load_expenses():
 
     return expenses
 
+def load_expenses_safely():
+    try:
+        return load_expenses()
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=500,
+            detail="Expense data file is invalid"
+        )
+
 def save_expenses(expenses):
     file_path = "data/expenses.json"
 
@@ -28,17 +40,11 @@ def save_expenses(expenses):
 
 @app.get("/api/expenses")
 def get_expenses():
-    try:
-        return load_expenses()
-    except json.JSONDecodeError:
-        raise HTTPException(
-            status_code=500,
-            detail="Expense data file is invalid"
-        )
+    return load_expenses_safely()
     
 @app.post("/api/expenses", status_code=201)
 def create_expense(expense: ExpenseCreate):
-    expenses = load_expenses()
+    expenses = load_expenses_safely()
     expense_data = expense.model_dump(mode="json")
     expenses.append(expense_data)
     save_expenses(expenses)
@@ -51,7 +57,7 @@ def summary_by_month(
         pattern=r"^\d{4}-(0[1-9]|1[0-2])$"
     )
 ):
-    expenses = load_expenses()
+    expenses = load_expenses_safely()
 
     total = 0.0
     count = 0
@@ -69,7 +75,7 @@ def summary_by_month(
 
 @app.get("/api/summary/category")
 def summary_by_category():
-    expenses = load_expenses()
+    expenses = load_expenses_safely()
     totals = {}
 
     for expense in expenses:
@@ -87,7 +93,7 @@ def summary_by_category():
 
 @app.get("/api/summary/payer")
 def summary_by_payer():
-    expenses = load_expenses()
+    expenses = load_expenses_safely()
     totals = {}
 
     for expense in expenses:
@@ -102,3 +108,7 @@ def summary_by_payer():
     return {
         "payer_totals": totals
     }
+
+@app.get("/", include_in_schema=False)
+def serve_home():
+    return FileResponse("frontend/index.html")
