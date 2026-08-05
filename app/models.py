@@ -10,12 +10,12 @@ class ExpenseCreate(BaseModel):
     payer: str
     note: str = ""
 
-    @field_validator("item")
+    @field_validator("item", "category", "payer")
     @classmethod
-    def item_must_not_be_blank(cls, value: str) -> str:
+    def required_text_must_not_be_blank(cls, value: str) -> str:
         cleaned_value = value.strip()
 
         if not cleaned_value:
-            raise ValueError("item cannot be blank")
+            raise ValueError("field cannot be blank")
 
         return cleaned_value
