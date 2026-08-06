@@ -1,70 +1,62 @@
-from fastapi import FastAPI, HTTPException, Query
+from contextlib import asynccontextmanager
+
+from sqlmodel import Session, select
+from fastapi import Depends, FastAPI, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from app.models import ExpenseCreate
-import json
-import os
 
-app = FastAPI()
+from app.database import create_db_and_tables, get_session
+from app.models import Expense, ExpenseCreate
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 @app.get("/api/health")
 def health_check():
     return {"status": "ok"}
 
-def load_expenses():
-
-    file_path = "data/expenses.json"
-
-    if not os.path.exists(file_path):
-        return []
-
-    with open(file_path, "r", encoding="utf-8") as file:
-        expenses = json.load(file)
-
-    return expenses
-
-def load_expenses_safely():
-    try:
-        return load_expenses()
-    except json.JSONDecodeError:
-        raise HTTPException(
-            status_code=500,
-            detail="Expense data file is invalid"
-        )
-
-def save_expenses(expenses):
-    file_path = "data/expenses.json"
-
-    with open(file_path, "w", encoding="utf-8") as file:
-        json.dump(expenses, file, ensure_ascii=False, indent=4)
-
 @app.get("/api/expenses")
-def get_expenses():
-    return load_expenses_safely()
+def get_expenses(session: Session = Depends(get_session)):
+    statement = select(Expense)
+    expenses = session.exec(statement).all()
+    return expenses
     
 @app.post("/api/expenses", status_code=201)
-def create_expense(expense: ExpenseCreate):
-    expenses = load_expenses_safely()
-    expense_data = expense.model_dump(mode="json")
-    expenses.append(expense_data)
-    save_expenses(expenses)
-    return expense_data
+def create_expense(
+    expense: ExpenseCreate,
+    session: Session = Depends(get_session)
+):
+    db_expense = Expense.model_validate(expense)
+
+    session.add(db_expense)
+    session.commit()
+    session.refresh(db_expense)
+
+    return db_expense
 
 @app.get("/api/summary/month")
 def summary_by_month(
     month: str = Query(
         ...,
         pattern=r"^\d{4}-(0[1-9]|1[0-2])$"
-    )
+    ),
+    session: Session = Depends(get_session)
 ):
-    expenses = load_expenses_safely()
+    statement = select(Expense)
+    expenses = session.exec(statement).all()
 
     total = 0.0
     count = 0
 
     for expense in expenses:
-        if expense["date"].startswith(month):
-            total += float(expense["amount"])
+        expense_month = expense.date.strftime("%Y-%m")
+
+        if expense_month == month:
+            total += expense.amount
             count += 1
 
     return {
@@ -74,13 +66,17 @@ def summary_by_month(
     }
 
 @app.get("/api/summary/category")
-def summary_by_category():
-    expenses = load_expenses_safely()
+def summary_by_category(
+    session: Session = Depends(get_session)
+):
+    statement = select(Expense)
+    expenses = session.exec(statement).all()
+
     totals = {}
 
     for expense in expenses:
-        category = expense["category"]
-        amount = float(expense["amount"])
+        category = expense.category
+        amount = expense.amount
 
         totals[category] = totals.get(category, 0.0) + amount
 
@@ -92,13 +88,17 @@ def summary_by_category():
     }
 
 @app.get("/api/summary/payer")
-def summary_by_payer():
-    expenses = load_expenses_safely()
+def summary_by_payer(
+    session: Session = Depends(get_session)
+):
+    statement = select(Expense)
+    expenses = session.exec(statement).all()
+
     totals = {}
 
     for expense in expenses:
-        payer = expense["payer"]
-        amount = float(expense["amount"])
+        payer = expense.payer
+        amount = expense.amount
 
         totals[payer] = totals.get(payer, 0.0) + amount
 

@@ -1,8 +1,9 @@
 from datetime import date
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import field_validator
+from sqlmodel import Field, SQLModel
 
-class ExpenseCreate(BaseModel):
+class ExpenseBase(SQLModel):
     date: date
     item: str = Field(min_length=1)
     amount: float = Field(gt=0)
@@ -19,3 +20,9 @@ class ExpenseCreate(BaseModel):
             raise ValueError("field cannot be blank")
 
         return cleaned_value
+
+class Expense(ExpenseBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+
+class ExpenseCreate(ExpenseBase):
+    pass
