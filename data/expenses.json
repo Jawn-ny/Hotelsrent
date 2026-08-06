@@ -62,5 +62,21 @@
         "category": "猫用品",
         "payer": "泷曦",
         "note": ""
+    },
+    {
+        "date": "2026-08-14",
+        "item": "-1",
+        "amount": 13.0,
+        "category": "猫用品",
+        "payer": "ASCS",
+        "note": ""
+    },
+    {
+        "date": "2026-08-05",
+        "item": "1",
+        "amount": 2.0,
+        "category": "2",
+        "payer": "2",
+        "note": "1"
     }
 ]
