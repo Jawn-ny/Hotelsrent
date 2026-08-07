@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
 from sqlmodel import Session, select
-from fastapi import Depends, FastAPI, Query
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
@@ -31,6 +31,50 @@ def create_expense(
     session: Session = Depends(get_session)
 ):
     db_expense = Expense.model_validate(expense)
+
+    session.add(db_expense)
+    session.commit()
+    session.refresh(db_expense)
+
+    return db_expense
+
+@app.delete("/api/expenses/{expense_id}")
+def delete_expense(
+    expense_id: int,
+    session: Session = Depends(get_session)
+):
+    expense = session.get(Expense, expense_id)
+
+    if expense is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Expense not found"
+        )
+
+    session.delete(expense)
+    session.commit()
+
+    return {
+        "message": "Expense deleted",
+        "id": expense_id
+    }
+
+@app.put("/api/expenses/{expense_id}")
+def update_expense(
+    expense_id: int,
+    expense: ExpenseCreate,
+    session: Session = Depends(get_session)
+):
+    db_expense = session.get(Expense, expense_id)
+
+    if db_expense is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Expense not found"
+        )
+
+    update_data = expense.model_dump()
+    db_expense.sqlmodel_update(update_data)
 
     session.add(db_expense)
     session.commit()

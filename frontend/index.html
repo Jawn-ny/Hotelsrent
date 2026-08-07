@@ -1,161 +1,409 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>ShouSi's House 记账板</title>
+
   <link rel="stylesheet" href="/frontend/styles.css" />
 </head>
+
 <body>
+
   <div class="page-shell">
+
     <header class="hero-card">
+
       <div class="hero-left">
-        <p class="eyebrow">Rent Life Expense Tracker</p>
-        <h1>ShouSi's House 记账板</h1>
-        <p class="hero-desc">
-          暖暖记录每一笔支出，像在小窝里整理生活。
+
+        <p class="eyebrow">
+          Rent Life Expense Tracker
         </p>
+
+        <h1>
+          ShouSi's House 记账板
+        </h1>
+
+        <p class="hero-desc">
+          暖暖记录每一笔支出，把租房生活整理得清清楚楚。
+        </p>
+
         <div class="hero-tags">
-          <span class="tag warm">卡通风</span>
-          <span class="tag cool">布偶猫蓝白点缀</span>
-          <span class="tag handdrawn">手绘按钮</span>
+
+          <span class="tag warm">
+            卡通风
+          </span>
+
+          <span class="tag cool">
+            布偶猫蓝白
+          </span>
+
+          <span class="tag handdrawn">
+            SQLite
+          </span>
+
         </div>
+
       </div>
+
+
       <div class="hero-right">
+
         <div class="cat-card">
+
           <div class="cat-face">
+
             <div class="ear left-ear"></div>
             <div class="ear right-ear"></div>
+
             <div class="eye left-eye"></div>
             <div class="eye right-eye"></div>
+
             <div class="nose"></div>
             <div class="mouth"></div>
+
           </div>
-          <p class="cat-note">布偶猫风小助手</p>
+
+          <p class="cat-note">
+            布偶猫记账小助手
+          </p>
+
         </div>
+
       </div>
+
     </header>
 
+
     <section class="status-row">
+
       <div class="status-card">
-        <h2>后端状态</h2>
-        <p id="health-status" class="status-pill pending">检测中...</p>
+
+        <h2>
+          后端状态
+        </h2>
+
+        <p
+          id="health-status"
+          class="status-pill pending"
+        >
+          检测中...
+        </p>
+
       </div>
+
+
       <div class="status-card">
-        <h2>快捷操作</h2>
+
+        <h2>
+          快捷操作
+        </h2>
+
         <div class="button-group">
-          <button id="refresh-expenses-btn" class="sketch-btn">刷新支出列表</button>
-          <button id="refresh-summary-btn" class="sketch-btn cool-btn">刷新分类/付款人统计</button>
+
+          <button
+            id="refresh-expenses-btn"
+            class="sketch-btn"
+          >
+            刷新支出列表
+          </button>
+
+          <button
+            id="refresh-summary-btn"
+            class="sketch-btn cool-btn"
+          >
+            刷新统计
+          </button>
+
         </div>
+
       </div>
+
     </section>
 
+
     <section class="content-grid">
+
       <div class="panel">
-        <h2>添加支出</h2>
-        <form id="expense-form" class="expense-form">
+
+        <div class="section-head">
+
+          <h2 id="form-title">
+            添加支出
+          </h2>
+
+          <span
+            id="edit-status"
+            class="edit-badge hidden"
+          >
+            编辑模式
+          </span>
+
+        </div>
+
+
+        <form
+          id="expense-form"
+          class="expense-form"
+        >
+
           <div class="form-grid">
+
             <label>
               日期
-              <input type="date" id="date" required />
+
+              <input
+                type="date"
+                id="date"
+                required
+              />
             </label>
+
 
             <label>
               物品
-              <input type="text" id="item" placeholder="例如：电饭煲" required />
+
+              <input
+                type="text"
+                id="item"
+                placeholder="例如：电饭煲"
+                required
+              />
             </label>
+
 
             <label>
               金额
-              <input type="number" id="amount" step="0.01" min="0.01" placeholder="例如：199" required />
+
+              <input
+                type="number"
+                id="amount"
+                step="0.01"
+                min="0.01"
+                placeholder="例如：199"
+                required
+              />
             </label>
+
 
             <label>
               分类
-              <input type="text" id="category" placeholder="例如：家电" required />
+
+              <input
+                type="text"
+                id="category"
+                placeholder="例如：家电"
+                required
+              />
             </label>
+
 
             <label>
               付款人
-              <input type="text" id="payer" placeholder="例如：A" required />
+
+              <input
+                type="text"
+                id="payer"
+                placeholder="例如：A"
+                required
+              />
             </label>
+
 
             <label class="full-width">
               备注
-              <input type="text" id="note" placeholder="例如：租房购买" />
+
+              <input
+                type="text"
+                id="note"
+                placeholder="例如：租房购买"
+              />
             </label>
+
           </div>
+
 
           <div class="button-group">
-            <button type="submit" class="sketch-btn">添加支出</button>
-            <button type="reset" class="sketch-btn light-btn">清空表单</button>
+
+            <button
+              id="submit-expense-btn"
+              type="submit"
+              class="sketch-btn"
+            >
+              添加支出
+            </button>
+
+
+            <button
+              id="cancel-edit-btn"
+              type="button"
+              class="sketch-btn cool-btn hidden"
+            >
+              取消编辑
+            </button>
+
+
+            <button
+              type="reset"
+              class="sketch-btn light-btn"
+            >
+              清空表单
+            </button>
+
           </div>
+
         </form>
 
-        <p id="form-message" class="message"></p>
+
+        <p
+          id="form-message"
+          class="message"
+        ></p>
+
       </div>
+
 
       <div class="panel">
-        <h2>按月份统计</h2>
+
+        <h2>
+          按月份统计
+        </h2>
+
         <div class="month-summary-box">
+
           <label>
             选择月份
-            <input type="month" id="summary-month" />
+
+            <input
+              type="month"
+              id="summary-month"
+            />
           </label>
-          <button id="month-summary-btn" class="sketch-btn">查询月份统计</button>
+
+
+          <button
+            id="month-summary-btn"
+            class="sketch-btn"
+          >
+            查询月份统计
+          </button>
+
         </div>
 
-        <div id="month-summary-result" class="result-card empty-state">
+
+        <div
+          id="month-summary-result"
+          class="result-card empty-state"
+        >
           这里会显示月份统计结果
         </div>
+
       </div>
+
     </section>
 
+
     <section class="panel">
+
       <div class="section-head">
-        <h2>全部支出记录</h2>
-        <span id="expense-count" class="count-badge">0 条记录</span>
+
+        <h2>
+          全部支出记录
+        </h2>
+
+        <span
+          id="expense-count"
+          class="count-badge"
+        >
+          0 条记录
+        </span>
+
       </div>
 
+
       <div class="table-wrap">
+
         <table>
+
           <thead>
+
             <tr>
+              <th>ID</th>
               <th>日期</th>
               <th>物品</th>
               <th>金额</th>
               <th>分类</th>
               <th>付款人</th>
               <th>备注</th>
+              <th>操作</th>
             </tr>
+
           </thead>
+
+
           <tbody id="expense-table-body">
+
             <tr>
-              <td colspan="6" class="empty-cell">暂无支出记录</td>
+              <td
+                colspan="8"
+                class="empty-cell"
+              >
+                暂无支出记录
+              </td>
             </tr>
+
           </tbody>
+
         </table>
+
       </div>
+
     </section>
+
 
     <section class="summary-grid">
-      <div class="panel">
-        <h2>按分类统计</h2>
-        <div id="category-summary" class="summary-list empty-state">
-          暂无分类统计数据
-        </div>
-      </div>
 
       <div class="panel">
-        <h2>按付款人统计</h2>
-        <div id="payer-summary" class="summary-list empty-state">
+
+        <h2>
+          按分类统计
+        </h2>
+
+        <div
+          id="category-summary"
+          class="summary-list empty-state"
+        >
+          暂无分类统计数据
+        </div>
+
+      </div>
+
+
+      <div class="panel">
+
+        <h2>
+          按付款人统计
+        </h2>
+
+        <div
+          id="payer-summary"
+          class="summary-list empty-state"
+        >
           暂无付款人统计数据
         </div>
+
       </div>
+
     </section>
+
   </div>
+
 
   <script src="/frontend/api.js"></script>
   <script src="/frontend/app.js"></script>
+
 </body>
+
 </html>
