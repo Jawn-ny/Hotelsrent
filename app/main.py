@@ -7,8 +7,8 @@ from fastapi.responses import FileResponse
 
 from app.database import create_db_and_tables, get_session
 from app.models import Expense, ExpenseCreate
-
-@asynccontextmanager
+#TODO:CI/CD
+#TODO:搜索、筛选、排序、分页
 async def lifespan(app: FastAPI):
     create_db_and_tables()
     yield
