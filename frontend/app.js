@@ -1,50 +1,97 @@
 const healthStatusEl =
-  document.getElementById("health-status");
+  document.getElementById(
+    "health-status"
+  );
 
 const expenseFormEl =
-  document.getElementById("expense-form");
+  document.getElementById(
+    "expense-form"
+  );
 
 const formTitleEl =
-  document.getElementById("form-title");
+  document.getElementById(
+    "form-title"
+  );
 
 const editStatusEl =
-  document.getElementById("edit-status");
+  document.getElementById(
+    "edit-status"
+  );
 
 const submitExpenseBtn =
-  document.getElementById("submit-expense-btn");
+  document.getElementById(
+    "submit-expense-btn"
+  );
 
 const cancelEditBtn =
-  document.getElementById("cancel-edit-btn");
+  document.getElementById(
+    "cancel-edit-btn"
+  );
 
 const formMessageEl =
-  document.getElementById("form-message");
+  document.getElementById(
+    "form-message"
+  );
 
 const expenseTableBodyEl =
-  document.getElementById("expense-table-body");
+  document.getElementById(
+    "expense-table-body"
+  );
 
 const expenseCountEl =
-  document.getElementById("expense-count");
+  document.getElementById(
+    "expense-count"
+  );
 
 const monthInputEl =
-  document.getElementById("summary-month");
+  document.getElementById(
+    "summary-month"
+  );
 
 const monthSummaryResultEl =
-  document.getElementById("month-summary-result");
+  document.getElementById(
+    "month-summary-result"
+  );
 
 const categorySummaryEl =
-  document.getElementById("category-summary");
+  document.getElementById(
+    "category-summary"
+  );
 
 const payerSummaryEl =
-  document.getElementById("payer-summary");
+  document.getElementById(
+    "payer-summary"
+  );
 
 const refreshExpensesBtn =
-  document.getElementById("refresh-expenses-btn");
+  document.getElementById(
+    "refresh-expenses-btn"
+  );
 
 const refreshSummaryBtn =
-  document.getElementById("refresh-summary-btn");
+  document.getElementById(
+    "refresh-summary-btn"
+  );
 
 const monthSummaryBtn =
-  document.getElementById("month-summary-btn");
+  document.getElementById(
+    "month-summary-btn"
+  );
+
+const expenseSearchInputEl =
+  document.getElementById(
+    "expense-search-input"
+  );
+
+const searchExpensesBtn =
+  document.getElementById(
+    "search-expenses-btn"
+  );
+
+const clearSearchBtn =
+  document.getElementById(
+    "clear-search-btn"
+  );
 
 
 let currentExpenses = [];
@@ -130,7 +177,7 @@ function renderExpenses(expenses) {
           colspan="8"
           class="empty-cell"
         >
-          暂无支出记录
+          没有找到符合条件的支出记录
         </td>
 
       </tr>
@@ -257,22 +304,24 @@ function renderSummaryList(
 
   container.innerHTML =
     entries
-      .map(([name, value]) => {
+      .map(
+        ([name, value]) => {
 
-        return `
-          <div class="summary-item">
+          return `
+            <div class="summary-item">
 
-            <span class="summary-name">
-              ${escapeHtml(name)}
-            </span>
+              <span class="summary-name">
+                ${escapeHtml(name)}
+              </span>
 
-            <span class="summary-value">
-              ${formatAmount(value)}
-            </span>
+              <span class="summary-value">
+                ${formatAmount(value)}
+              </span>
 
-          </div>
-        `;
-      })
+            </div>
+          `;
+        }
+      )
       .join("");
 }
 
@@ -313,6 +362,7 @@ function getFormPayload() {
       document
         .getElementById("note")
         .value
+
   };
 }
 
@@ -436,8 +486,15 @@ async function loadExpenses() {
 
   try {
 
+    const keyword =
+      expenseSearchInputEl
+        .value
+        .trim();
+
     const expenses =
-      await api.getExpenses();
+      await api.getExpenses(
+        keyword
+      );
 
     renderExpenses(
       expenses
@@ -584,7 +641,9 @@ expenseFormEl.addEventListener(
 
     try {
 
-      if (editingExpenseId === null) {
+      if (
+        editingExpenseId === null
+      ) {
 
         await api.createExpense(
           payload
@@ -731,8 +790,10 @@ expenseTableBodyEl.addEventListener(
 
 
         if (
-          editingExpenseId === expenseId
+          editingExpenseId ===
+          expenseId
         ) {
+
           leaveEditMode();
         }
 
@@ -782,15 +843,19 @@ expenseFormEl.addEventListener(
   "reset",
   () => {
 
-    if (editingExpenseId !== null) {
+    if (
+      editingExpenseId !== null
+    ) {
 
       setTimeout(
         () => {
+
           leaveEditMode();
 
           showMessage(
             "已退出编辑模式。"
           );
+
         },
         0
       );
@@ -838,6 +903,46 @@ monthSummaryBtn.addEventListener(
 
       monthSummaryResultEl.textContent =
         `查询失败：${error.message}`;
+    }
+  }
+);
+
+
+
+searchExpensesBtn.addEventListener(
+  "click",
+  async () => {
+
+    await loadExpenses();
+  }
+);
+
+
+
+clearSearchBtn.addEventListener(
+  "click",
+  async () => {
+
+    expenseSearchInputEl.value =
+      "";
+
+    await loadExpenses();
+  }
+);
+
+
+
+expenseSearchInputEl.addEventListener(
+  "keydown",
+  async (event) => {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      event.preventDefault();
+
+      await loadExpenses();
     }
   }
 );

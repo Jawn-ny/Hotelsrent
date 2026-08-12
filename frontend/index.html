@@ -3,17 +3,25 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
   <title>ShouSi's House 记账板</title>
 
-  <link rel="stylesheet" href="/frontend/styles.css" />
+  <link
+    rel="stylesheet"
+    href="/frontend/styles.css"
+  />
 </head>
+
 
 <body>
 
   <div class="page-shell">
 
+    <!-- 顶部区域 -->
     <header class="hero-card">
 
       <div class="hero-left">
@@ -77,6 +85,7 @@
     </header>
 
 
+    <!-- 状态和快捷操作 -->
     <section class="status-row">
 
       <div class="status-card">
@@ -124,6 +133,7 @@
     </section>
 
 
+    <!-- 添加支出 + 月份统计 -->
     <section class="content-grid">
 
       <div class="panel">
@@ -305,6 +315,7 @@
     </section>
 
 
+    <!-- 支出记录 -->
     <section class="panel">
 
       <div class="section-head">
@@ -319,6 +330,42 @@
         >
           0 条记录
         </span>
+
+      </div>
+
+
+      <!-- 搜索 -->
+      <div class="search-bar">
+
+        <label class="search-input-group">
+
+          <span>
+            搜索支出
+          </span>
+
+          <input
+            type="text"
+            id="expense-search-input"
+            placeholder="搜索物品、分类、付款人或备注"
+          />
+
+        </label>
+
+
+        <button
+          id="search-expenses-btn"
+          class="sketch-btn"
+        >
+          搜索
+        </button>
+
+
+        <button
+          id="clear-search-btn"
+          class="sketch-btn light-btn"
+        >
+          清除搜索
+        </button>
 
       </div>
 
@@ -346,12 +393,14 @@
           <tbody id="expense-table-body">
 
             <tr>
+
               <td
                 colspan="8"
                 class="empty-cell"
               >
                 暂无支出记录
               </td>
+
             </tr>
 
           </tbody>
@@ -363,6 +412,7 @@
     </section>
 
 
+    <!-- 分类和付款人统计 -->
     <section class="summary-grid">
 
       <div class="panel">

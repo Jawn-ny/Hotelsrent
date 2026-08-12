@@ -1,50 +1,73 @@
 const api = {
 
   async getHealth() {
-    const response = await fetch("/api/health");
+
+    const response =
+      await fetch("/api/health");
+
     return this.handleResponse(response);
   },
 
 
-  async getExpenses() {
-    const response = await fetch("/api/expenses");
+  async getExpenses(keyword = "") {
+
+    const cleanedKeyword =
+      keyword.trim();
+
+    const query =
+      cleanedKeyword
+        ? `?keyword=${encodeURIComponent(cleanedKeyword)}`
+        : "";
+
+    const response =
+      await fetch(
+        `/api/expenses${query}`
+      );
+
     return this.handleResponse(response);
   },
 
 
   async createExpense(payload) {
 
-    const response = await fetch(
-      "/api/expenses",
-      {
-        method: "POST",
+    const response =
+      await fetch(
+        "/api/expenses",
+        {
+          method: "POST",
 
-        headers: {
-          "Content-Type": "application/json"
-        },
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-        body: JSON.stringify(payload)
-      }
-    );
+          body:
+            JSON.stringify(payload)
+        }
+      );
 
     return this.handleResponse(response);
   },
 
 
-  async updateExpense(expenseId, payload) {
+  async updateExpense(
+    expenseId,
+    payload
+  ) {
 
-    const response = await fetch(
-      `/api/expenses/${expenseId}`,
-      {
-        method: "PUT",
+    const response =
+      await fetch(
+        `/api/expenses/${expenseId}`,
+        {
+          method: "PUT",
 
-        headers: {
-          "Content-Type": "application/json"
-        },
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-        body: JSON.stringify(payload)
-      }
-    );
+          body:
+            JSON.stringify(payload)
+        }
+      );
 
     return this.handleResponse(response);
   },
@@ -52,12 +75,13 @@ const api = {
 
   async deleteExpense(expenseId) {
 
-    const response = await fetch(
-      `/api/expenses/${expenseId}`,
-      {
-        method: "DELETE"
-      }
-    );
+    const response =
+      await fetch(
+        `/api/expenses/${expenseId}`,
+        {
+          method: "DELETE"
+        }
+      );
 
     return this.handleResponse(response);
   },
@@ -65,9 +89,10 @@ const api = {
 
   async getMonthSummary(month) {
 
-    const response = await fetch(
-      `/api/summary/month?month=${encodeURIComponent(month)}`
-    );
+    const response =
+      await fetch(
+        `/api/summary/month?month=${encodeURIComponent(month)}`
+      );
 
     return this.handleResponse(response);
   },
@@ -75,9 +100,10 @@ const api = {
 
   async getCategorySummary() {
 
-    const response = await fetch(
-      "/api/summary/category"
-    );
+    const response =
+      await fetch(
+        "/api/summary/category"
+      );
 
     return this.handleResponse(response);
   },
@@ -85,9 +111,10 @@ const api = {
 
   async getPayerSummary() {
 
-    const response = await fetch(
-      "/api/summary/payer"
-    );
+    const response =
+      await fetch(
+        "/api/summary/payer"
+      );
 
     return this.handleResponse(response);
   },
@@ -98,26 +125,41 @@ const api = {
     let data = null;
 
     try {
-      data = await response.json();
+
+      data =
+        await response.json();
+
     } catch {
+
       data = {};
     }
 
 
     if (!response.ok) {
 
-      let message = "请求失败";
+      let message =
+        "请求失败";
 
 
-      if (typeof data.detail === "string") {
-        message = data.detail;
+      if (
+        typeof data.detail === "string"
+      ) {
+
+        message =
+          data.detail;
       }
 
-      else if (Array.isArray(data.detail)) {
+      else if (
+        Array.isArray(data.detail)
+      ) {
 
-        message = data.detail
-          .map((error) => error.msg)
-          .join("；");
+        message =
+          data.detail
+            .map(
+              (error) =>
+                error.msg
+            )
+            .join("；");
       }
 
 

@@ -6,6 +6,70 @@ def test_get_expenses_starts_empty(client):
     assert response.status_code == 200
     assert response.json() == []
 
+def test_search_expenses_by_keyword(client):
+    expenses = [
+        {
+            "date": "2026-08-11",
+            "item": "电饭煲",
+            "amount": 199,
+            "category": "家电",
+            "payer": "A",
+            "note": "厨房使用"
+        },
+        {
+            "date": "2026-08-11",
+            "item": "牛奶",
+            "amount": 10,
+            "category": "食品",
+            "payer": "小王",
+            "note": "早餐"
+        },
+        {
+            "date": "2026-08-11",
+            "item": "椅子",
+            "amount": 80,
+            "category": "家具",
+            "payer": "B",
+            "note": "放在客厅"
+        }
+    ]
+
+    for expense in expenses:
+        response = client.post(
+            "/api/expenses",
+            json=expense
+        )
+
+        assert response.status_code == 201
+
+    item_response = client.get(
+        "/api/expenses?keyword=电饭煲"
+    )
+    assert item_response.status_code == 200
+    assert len(item_response.json()) == 1
+    assert item_response.json()[0]["item"] == "电饭煲"
+
+    category_response = client.get(
+        "/api/expenses?keyword=食品"
+    )
+    assert category_response.status_code == 200
+    assert len(category_response.json()) == 1
+    assert category_response.json()[0]["item"] == "牛奶"
+
+    payer_response = client.get(
+        "/api/expenses?keyword=小王"
+    )
+    assert payer_response.status_code == 200
+    assert len(payer_response.json()) == 1
+    assert payer_response.json()[0]["item"] == "牛奶"
+
+    note_response = client.get(
+        "/api/expenses?keyword=客厅"
+    )
+    assert note_response.status_code == 200
+    assert len(note_response.json()) == 1
+    assert note_response.json()[0]["item"] == "椅子"
+
 def test_create_expense(client):
     expense_data = {
         "date": "2026-08-09",

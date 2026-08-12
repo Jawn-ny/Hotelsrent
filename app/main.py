@@ -1,14 +1,14 @@
 from contextlib import asynccontextmanager
 
 from sqlmodel import Session, select
+from sqlalchemy import or_
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from app.database import create_db_and_tables, get_session
 from app.models import Expense, ExpenseCreate
-#TODO:CI/CD
-#TODO:搜索、筛选、排序、分页
+
 async def lifespan(app: FastAPI):
     create_db_and_tables()
     yield
@@ -20,8 +20,25 @@ def health_check():
     return {"status": "ok"}
 
 @app.get("/api/expenses")
-def get_expenses(session: Session = Depends(get_session)):
+def get_expenses(
+    keyword: str | None = None,
+    session: Session = Depends(get_session)
+):
     statement = select(Expense)
+
+    if keyword:
+        keyword = keyword.strip()
+
+        if keyword:
+            statement = statement.where(
+                or_(
+                    Expense.item.contains(keyword),
+                    Expense.category.contains(keyword),
+                    Expense.payer.contains(keyword),
+                    Expense.note.contains(keyword)
+                )
+            )
+
     expenses = session.exec(statement).all()
     return expenses
     

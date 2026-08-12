@@ -681,7 +681,8 @@ h2 {
 
 
 .expense-form label,
-.month-summary-box label {
+.month-summary-box label,
+.search-input-group {
   display:
     flex;
 
@@ -758,6 +759,47 @@ input:focus {
 
   gap:
     14px;
+}
+
+
+
+.search-bar {
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(240px, 1fr)
+    auto
+    auto;
+
+  gap:
+    12px;
+
+  align-items:
+    end;
+
+  margin-bottom:
+    20px;
+
+  padding:
+    16px;
+
+  border:
+    2px dashed
+    var(--line);
+
+  border-radius:
+    18px;
+
+  background:
+    #fff9f2;
+}
+
+
+
+.search-bar .sketch-btn {
+  margin-bottom:
+    1px;
 }
 
 
@@ -1023,6 +1065,12 @@ tbody tr:hover {
       1fr;
   }
 
+
+  .search-bar {
+    grid-template-columns:
+      1fr;
+  }
+
 }
 
 
@@ -1049,6 +1097,15 @@ tbody tr:hover {
   .hero-card h1 {
     font-size:
       1.6rem;
+  }
+
+
+  .section-head {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
   }
 
 }
