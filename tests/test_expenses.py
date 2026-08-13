@@ -178,6 +178,112 @@ def test_filter_expenses_by_category_and_payer(client):
         == "电风扇"
     )
 
+def test_sort_expenses(client):
+    expenses = [
+        {
+            "date": "2026-08-01",
+            "item": "牛奶",
+            "amount": 10,
+            "category": "食品",
+            "payer": "A",
+            "note": ""
+        },
+        {
+            "date": "2026-08-03",
+            "item": "电饭煲",
+            "amount": 199,
+            "category": "家电",
+            "payer": "A",
+            "note": ""
+        },
+        {
+            "date": "2026-08-02",
+            "item": "椅子",
+            "amount": 80,
+            "category": "家具",
+            "payer": "B",
+            "note": ""
+        },
+        {
+            "date": "2026-08-04",
+            "item": "电风扇",
+            "amount": 120,
+            "category": "家电",
+            "payer": "B",
+            "note": ""
+        }
+    ]
+
+    for expense in expenses:
+        response = client.post(
+            "/api/expenses",
+            json=expense
+        )
+
+        assert response.status_code == 201
+
+    date_response = client.get(
+        "/api/expenses?sort_by=date&sort_order=desc"
+    )
+
+    assert date_response.status_code == 200
+
+    date_items = [
+        expense["item"]
+        for expense in date_response.json()
+    ]
+
+    assert date_items == [
+        "电风扇",
+        "电饭煲",
+        "椅子",
+        "牛奶"
+    ]
+
+    amount_response = client.get(
+        "/api/expenses?sort_by=amount&sort_order=asc"
+    )
+
+    assert amount_response.status_code == 200
+
+    amount_items = [
+        expense["item"]
+        for expense in amount_response.json()
+    ]
+
+    assert amount_items == [
+        "牛奶",
+        "椅子",
+        "电风扇",
+        "电饭煲"
+    ]
+
+    combined_response = client.get(
+        "/api/expenses"
+        "?keyword=电"
+        "&category=家电"
+        "&sort_by=amount"
+        "&sort_order=asc"
+    )
+
+    assert combined_response.status_code == 200
+
+    combined_items = [
+        expense["item"]
+        for expense in combined_response.json()
+    ]
+
+    assert combined_items == [
+        "电风扇",
+        "电饭煲"
+    ]
+
+    invalid_response = client.get(
+        "/api/expenses?sort_by=unknown"
+    )
+
+    assert invalid_response.status_code == 422
+
 def test_create_expense(client):
     expense_data = {
         "date": "2026-08-09",

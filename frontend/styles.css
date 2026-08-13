@@ -513,8 +513,7 @@ h2 {
   display:
     flex;
 
-  flex-wrap:
-    wrap;
+  flex-wrap: wrap;
 
   gap:
     12px;
@@ -682,7 +681,7 @@ h2 {
 
 .expense-form label,
 .month-summary-box label,
-.search-input-group {
+.query-field {
   display:
     flex;
 
@@ -705,7 +704,8 @@ h2 {
 
 
 
-input {
+input,
+select {
   width:
     100%;
 
@@ -734,7 +734,15 @@ input {
 
 
 
-input:focus {
+select {
+  cursor:
+    pointer;
+}
+
+
+
+input:focus,
+select:focus {
   border-color:
     var(--accent-cool-dark);
 
@@ -763,43 +771,78 @@ input:focus {
 
 
 
-.search-bar {
-  display:
-    grid;
-
-  grid-template-columns:
-    minmax(240px, 1fr)
-    auto
-    auto;
-
-  gap:
-    12px;
-
-  align-items:
-    end;
+.query-panel {
+  padding:
+    16px;
 
   margin-bottom:
     20px;
 
-  padding:
-    16px;
+  background:
+    #fff9f2;
 
   border:
     2px dashed
     var(--line);
 
   border-radius:
-    18px;
-
-  background:
-    #fff9f2;
+    20px;
 }
 
 
 
-.search-bar .sketch-btn {
+.search-row,
+.filter-row,
+.sort-row {
+  display:
+    grid;
+
+  gap:
+    12px;
+
+  align-items:
+    end;
+}
+
+
+
+.search-row {
+  grid-template-columns:
+    minmax(260px, 1fr)
+    auto
+    auto;
+
   margin-bottom:
-    1px;
+    14px;
+}
+
+
+
+.filter-row,
+.sort-row {
+  grid-template-columns:
+    minmax(180px, 1fr)
+    minmax(180px, 1fr)
+    auto
+    auto;
+}
+
+
+
+.filter-row {
+  margin-bottom:
+    14px;
+}
+
+
+
+.sort-row {
+  padding-top:
+    14px;
+
+  border-top:
+    1px dashed
+    var(--line);
 }
 
 
@@ -1066,7 +1109,9 @@ tbody tr:hover {
   }
 
 
-  .search-bar {
+  .search-row,
+  .filter-row,
+  .sort-row {
     grid-template-columns:
       1fr;
   }

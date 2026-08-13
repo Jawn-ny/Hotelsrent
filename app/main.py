@@ -24,6 +24,14 @@ def get_expenses(
     keyword: str | None = None,
     category: str | None = None,
     payer: str | None = None,
+    sort_by: str = Query(
+        "date",
+        pattern=r"^(date|amount|item)$"
+    ),
+    sort_order: str = Query(
+        "desc",
+        pattern=r"^(asc|desc)$"
+    ),
     session: Session = Depends(get_session)
 ):
     statement = select(Expense)
@@ -56,6 +64,25 @@ def get_expenses(
             statement = statement.where(
                 Expense.payer == payer
             )
+
+    sort_columns = {
+        "date": Expense.date,
+        "amount": Expense.amount,
+        "item": Expense.item
+    }
+
+    sort_column = sort_columns[sort_by]
+
+    if sort_order == "asc":
+        statement = statement.order_by(
+            sort_column.asc(),
+            Expense.id.asc()
+        )
+    else:
+        statement = statement.order_by(
+            sort_column.desc(),
+            Expense.id.desc()
+        )
 
     expenses = session.exec(statement).all()
 

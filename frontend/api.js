@@ -1,7 +1,6 @@
 const api = {
 
   async getHealth() {
-
     const response =
       await fetch("/api/health");
 
@@ -12,7 +11,9 @@ const api = {
   async getExpenses(
     keyword = "",
     category = "",
-    payer = ""
+    payer = "",
+    sortBy = "date",
+    sortOrder = "desc"
   ) {
 
     const params =
@@ -30,7 +31,6 @@ const api = {
 
 
     if (cleanedKeyword) {
-
       params.set(
         "keyword",
         cleanedKeyword
@@ -39,7 +39,6 @@ const api = {
 
 
     if (cleanedCategory) {
-
       params.set(
         "category",
         cleanedCategory
@@ -48,7 +47,6 @@ const api = {
 
 
     if (cleanedPayer) {
-
       params.set(
         "payer",
         cleanedPayer
@@ -56,18 +54,21 @@ const api = {
     }
 
 
-    const queryString =
-      params.toString();
+    params.set(
+      "sort_by",
+      sortBy
+    );
 
-
-    const url =
-      queryString
-        ? `/api/expenses?${queryString}`
-        : "/api/expenses";
+    params.set(
+      "sort_order",
+      sortOrder
+    );
 
 
     const response =
-      await fetch(url);
+      await fetch(
+        `/api/expenses?${params.toString()}`
+      );
 
 
     return this.handleResponse(
@@ -127,9 +128,7 @@ const api = {
   },
 
 
-  async deleteExpense(
-    expenseId
-  ) {
+  async deleteExpense(expenseId) {
 
     const response =
       await fetch(
@@ -190,12 +189,9 @@ const api = {
 
 
     try {
-
       data =
         await response.json();
-
     } catch {
-
       data = {};
     }
 
@@ -210,7 +206,6 @@ const api = {
         typeof data.detail ===
         "string"
       ) {
-
         message =
           data.detail;
       }
@@ -218,7 +213,6 @@ const api = {
       else if (
         Array.isArray(data.detail)
       ) {
-
         message =
           data.detail
             .map(

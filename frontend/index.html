@@ -17,7 +17,6 @@
   />
 </head>
 
-
 <body>
 
   <div class="page-shell">
@@ -335,7 +334,7 @@
 
         <div class="search-row">
 
-          <label class="query-field search-field">
+          <label class="query-field">
 
             <span>
               关键词搜索
@@ -417,6 +416,72 @@
             class="sketch-btn light-btn"
           >
             清除筛选
+          </button>
+
+        </div>
+
+
+        <div class="sort-row">
+
+          <label class="query-field">
+
+            <span>
+              排序字段
+            </span>
+
+            <select id="sort-by">
+
+              <option value="date">
+                日期
+              </option>
+
+              <option value="amount">
+                金额
+              </option>
+
+              <option value="item">
+                物品
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <label class="query-field">
+
+            <span>
+              排序方向
+            </span>
+
+            <select id="sort-order">
+
+              <option value="desc">
+                降序
+              </option>
+
+              <option value="asc">
+                升序
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <button
+            id="apply-sort-btn"
+            class="sketch-btn cool-btn"
+          >
+            应用排序
+          </button>
+
+
+          <button
+            id="clear-sort-btn"
+            class="sketch-btn light-btn"
+          >
+            恢复默认排序
           </button>
 
         </div>

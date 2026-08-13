@@ -113,6 +113,26 @@ const clearFilterBtn =
     "clear-filter-btn"
   );
 
+const sortByEl =
+  document.getElementById(
+    "sort-by"
+  );
+
+const sortOrderEl =
+  document.getElementById(
+    "sort-order"
+  );
+
+const applySortBtn =
+  document.getElementById(
+    "apply-sort-btn"
+  );
+
+const clearSortBtn =
+  document.getElementById(
+    "clear-sort-btn"
+  );
+
 
 let currentExpenses = [];
 
@@ -192,14 +212,12 @@ function renderExpenses(expenses) {
 
     expenseTableBodyEl.innerHTML = `
       <tr>
-
         <td
           colspan="8"
           class="empty-cell"
         >
           没有找到符合条件的支出记录
         </td>
-
       </tr>
     `;
 
@@ -357,14 +375,14 @@ function populateSelect(
     selectElement.value;
 
 
-  const options =
-    [
-      `<option value="">${emptyText}</option>`,
-      ...values.map(
-        (value) =>
-          `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`
-      )
-    ];
+  const options = [
+    `<option value="">${emptyText}</option>`,
+
+    ...values.map(
+      (value) =>
+        `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`
+    )
+  ];
 
 
   selectElement.innerHTML =
@@ -374,7 +392,6 @@ function populateSelect(
   if (
     values.includes(currentValue)
   ) {
-
     selectElement.value =
       currentValue;
   }
@@ -417,7 +434,6 @@ function getFormPayload() {
       document
         .getElementById("note")
         .value
-
   };
 }
 
@@ -494,16 +510,13 @@ function leaveEditMode() {
   editingExpenseId =
     null;
 
-
   expenseFormEl.reset();
-
 
   formTitleEl.textContent =
     "添加支出";
 
   submitExpenseBtn.textContent =
     "添加支出";
-
 
   editStatusEl.classList.add(
     "hidden"
@@ -545,30 +558,28 @@ async function loadFilterOptions() {
       await api.getExpenses();
 
 
-    const categories =
-      [
-        ...new Set(
-          allExpenses.map(
-            (expense) =>
-              expense.category
-          )
+    const categories = [
+      ...new Set(
+        allExpenses.map(
+          (expense) =>
+            expense.category
         )
-      ]
-        .filter(Boolean)
-        .sort();
+      )
+    ]
+      .filter(Boolean)
+      .sort();
 
 
-    const payers =
-      [
-        ...new Set(
-          allExpenses.map(
-            (expense) =>
-              expense.payer
-          )
+    const payers = [
+      ...new Set(
+        allExpenses.map(
+          (expense) =>
+            expense.payer
         )
-      ]
-        .filter(Boolean)
-        .sort();
+      )
+    ]
+      .filter(Boolean)
+      .sort();
 
 
     populateSelect(
@@ -610,12 +621,20 @@ async function loadExpenses() {
     const payer =
       payerFilterEl.value;
 
+    const sortBy =
+      sortByEl.value;
+
+    const sortOrder =
+      sortOrderEl.value;
+
 
     const expenses =
       await api.getExpenses(
         keyword,
         category,
-        payer
+        payer,
+        sortBy,
+        sortOrder
       );
 
 
@@ -627,7 +646,6 @@ async function loadExpenses() {
 
     expenseTableBodyEl.innerHTML = `
       <tr>
-
         <td
           colspan="8"
           class="empty-cell"
@@ -635,7 +653,6 @@ async function loadExpenses() {
           加载失败：
           ${escapeHtml(error.message)}
         </td>
-
       </tr>
     `;
 
@@ -663,7 +680,6 @@ async function loadCategorySummary() {
     const data =
       await api.getCategorySummary();
 
-
     renderSummaryList(
       categorySummaryEl,
       data.category_totals,
@@ -688,7 +704,6 @@ async function loadPayerSummary() {
 
     const data =
       await api.getPayerSummary();
-
 
     renderSummaryList(
       payerSummaryEl,
@@ -725,7 +740,6 @@ async function refreshSelectedMonthSummary() {
 
 
   if (!monthValue) {
-
     return;
   }
 
@@ -736,7 +750,6 @@ async function refreshSelectedMonthSummary() {
       await api.getMonthSummary(
         monthValue
       );
-
 
     renderMonthSummary(
       data
@@ -786,12 +799,10 @@ expenseFormEl.addEventListener(
           payload
         );
 
-
         showMessage(
           "添加成功，已经保存到 SQLite 数据库。",
           "success"
         );
-
 
         expenseFormEl.reset();
 
@@ -803,9 +814,7 @@ expenseFormEl.addEventListener(
             payload
           );
 
-
         leaveEditMode();
-
 
         showMessage(
           `支出 #${updatedExpense.id} 修改成功。`,
@@ -908,7 +917,6 @@ expenseTableBodyEl.addEventListener(
 
 
       if (!confirmed) {
-
         return;
       }
 
@@ -931,7 +939,6 @@ expenseTableBodyEl.addEventListener(
           editingExpenseId ===
           expenseId
         ) {
-
           leaveEditMode();
         }
 
@@ -1030,7 +1037,6 @@ monthSummaryBtn.addEventListener(
           monthValue
         );
 
-
       renderMonthSummary(
         data
       );
@@ -1101,6 +1107,29 @@ clearFilterBtn.addEventListener(
 
     payerFilterEl.value =
       "";
+
+    await loadExpenses();
+  }
+);
+
+
+
+applySortBtn.addEventListener(
+  "click",
+  loadExpenses
+);
+
+
+
+clearSortBtn.addEventListener(
+  "click",
+  async () => {
+
+    sortByEl.value =
+      "date";
+
+    sortOrderEl.value =
+      "desc";
 
     await loadExpenses();
   }
