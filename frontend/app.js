@@ -93,6 +93,26 @@ const clearSearchBtn =
     "clear-search-btn"
   );
 
+const categoryFilterEl =
+  document.getElementById(
+    "category-filter"
+  );
+
+const payerFilterEl =
+  document.getElementById(
+    "payer-filter"
+  );
+
+const applyFilterBtn =
+  document.getElementById(
+    "apply-filter-btn"
+  );
+
+const clearFilterBtn =
+  document.getElementById(
+    "clear-filter-btn"
+  );
+
 
 let currentExpenses = [];
 
@@ -327,6 +347,41 @@ function renderSummaryList(
 
 
 
+function populateSelect(
+  selectElement,
+  values,
+  emptyText
+) {
+
+  const currentValue =
+    selectElement.value;
+
+
+  const options =
+    [
+      `<option value="">${emptyText}</option>`,
+      ...values.map(
+        (value) =>
+          `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`
+      )
+    ];
+
+
+  selectElement.innerHTML =
+    options.join("");
+
+
+  if (
+    values.includes(currentValue)
+  ) {
+
+    selectElement.value =
+      currentValue;
+  }
+}
+
+
+
 function getFormPayload() {
 
   return {
@@ -482,6 +537,64 @@ async function loadHealth() {
 
 
 
+async function loadFilterOptions() {
+
+  try {
+
+    const allExpenses =
+      await api.getExpenses();
+
+
+    const categories =
+      [
+        ...new Set(
+          allExpenses.map(
+            (expense) =>
+              expense.category
+          )
+        )
+      ]
+        .filter(Boolean)
+        .sort();
+
+
+    const payers =
+      [
+        ...new Set(
+          allExpenses.map(
+            (expense) =>
+              expense.payer
+          )
+        )
+      ]
+        .filter(Boolean)
+        .sort();
+
+
+    populateSelect(
+      categoryFilterEl,
+      categories,
+      "全部分类"
+    );
+
+
+    populateSelect(
+      payerFilterEl,
+      payers,
+      "全部付款人"
+    );
+
+  } catch (error) {
+
+    console.error(
+      "加载筛选选项失败：",
+      error
+    );
+  }
+}
+
+
+
 async function loadExpenses() {
 
   try {
@@ -491,10 +604,20 @@ async function loadExpenses() {
         .value
         .trim();
 
+    const category =
+      categoryFilterEl.value;
+
+    const payer =
+      payerFilterEl.value;
+
+
     const expenses =
       await api.getExpenses(
-        keyword
+        keyword,
+        category,
+        payer
       );
+
 
     renderExpenses(
       expenses
@@ -516,9 +639,19 @@ async function loadExpenses() {
       </tr>
     `;
 
+
     expenseCountEl.textContent =
       "加载失败";
   }
+}
+
+
+
+async function refreshExpenseArea() {
+
+  await loadFilterOptions();
+
+  await loadExpenses();
 }
 
 
@@ -529,6 +662,7 @@ async function loadCategorySummary() {
 
     const data =
       await api.getCategorySummary();
+
 
     renderSummaryList(
       categorySummaryEl,
@@ -554,6 +688,7 @@ async function loadPayerSummary() {
 
     const data =
       await api.getPayerSummary();
+
 
     renderSummaryList(
       payerSummaryEl,
@@ -590,6 +725,7 @@ async function refreshSelectedMonthSummary() {
 
 
   if (!monthValue) {
+
     return;
   }
 
@@ -600,6 +736,7 @@ async function refreshSelectedMonthSummary() {
       await api.getMonthSummary(
         monthValue
       );
+
 
     renderMonthSummary(
       data
@@ -619,7 +756,7 @@ async function refreshSelectedMonthSummary() {
 
 async function refreshAllData() {
 
-  await loadExpenses();
+  await refreshExpenseArea();
 
   await loadAllSummaries();
 
@@ -771,6 +908,7 @@ expenseTableBodyEl.addEventListener(
 
 
       if (!confirmed) {
+
         return;
       }
 
@@ -892,6 +1030,7 @@ monthSummaryBtn.addEventListener(
           monthValue
         );
 
+
       renderMonthSummary(
         data
       );
@@ -911,10 +1050,7 @@ monthSummaryBtn.addEventListener(
 
 searchExpensesBtn.addEventListener(
   "click",
-  async () => {
-
-    await loadExpenses();
-  }
+  loadExpenses
 );
 
 
@@ -949,9 +1085,32 @@ expenseSearchInputEl.addEventListener(
 
 
 
-refreshExpensesBtn.addEventListener(
+applyFilterBtn.addEventListener(
   "click",
   loadExpenses
+);
+
+
+
+clearFilterBtn.addEventListener(
+  "click",
+  async () => {
+
+    categoryFilterEl.value =
+      "";
+
+    payerFilterEl.value =
+      "";
+
+    await loadExpenses();
+  }
+);
+
+
+
+refreshExpensesBtn.addEventListener(
+  "click",
+  refreshExpenseArea
 );
 
 
@@ -971,6 +1130,8 @@ refreshSummaryBtn.addEventListener(
 async function init() {
 
   await loadHealth();
+
+  await loadFilterOptions();
 
   await loadExpenses();
 

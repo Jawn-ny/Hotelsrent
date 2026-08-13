@@ -22,6 +22,8 @@ def health_check():
 @app.get("/api/expenses")
 def get_expenses(
     keyword: str | None = None,
+    category: str | None = None,
+    payer: str | None = None,
     session: Session = Depends(get_session)
 ):
     statement = select(Expense)
@@ -39,7 +41,24 @@ def get_expenses(
                 )
             )
 
+    if category:
+        category = category.strip()
+
+        if category:
+            statement = statement.where(
+                Expense.category == category
+            )
+
+    if payer:
+        payer = payer.strip()
+
+        if payer:
+            statement = statement.where(
+                Expense.payer == payer
+            )
+
     expenses = session.exec(statement).all()
+
     return expenses
     
 @app.post("/api/expenses", status_code=201)

@@ -9,22 +9,70 @@ const api = {
   },
 
 
-  async getExpenses(keyword = "") {
+  async getExpenses(
+    keyword = "",
+    category = "",
+    payer = ""
+  ) {
+
+    const params =
+      new URLSearchParams();
+
 
     const cleanedKeyword =
       keyword.trim();
 
-    const query =
-      cleanedKeyword
-        ? `?keyword=${encodeURIComponent(cleanedKeyword)}`
-        : "";
+    const cleanedCategory =
+      category.trim();
+
+    const cleanedPayer =
+      payer.trim();
+
+
+    if (cleanedKeyword) {
+
+      params.set(
+        "keyword",
+        cleanedKeyword
+      );
+    }
+
+
+    if (cleanedCategory) {
+
+      params.set(
+        "category",
+        cleanedCategory
+      );
+    }
+
+
+    if (cleanedPayer) {
+
+      params.set(
+        "payer",
+        cleanedPayer
+      );
+    }
+
+
+    const queryString =
+      params.toString();
+
+
+    const url =
+      queryString
+        ? `/api/expenses?${queryString}`
+        : "/api/expenses";
+
 
     const response =
-      await fetch(
-        `/api/expenses${query}`
-      );
+      await fetch(url);
 
-    return this.handleResponse(response);
+
+    return this.handleResponse(
+      response
+    );
   },
 
 
@@ -37,7 +85,8 @@ const api = {
           method: "POST",
 
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type":
+              "application/json"
           },
 
           body:
@@ -45,7 +94,9 @@ const api = {
         }
       );
 
-    return this.handleResponse(response);
+    return this.handleResponse(
+      response
+    );
   },
 
 
@@ -61,7 +112,8 @@ const api = {
           method: "PUT",
 
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type":
+              "application/json"
           },
 
           body:
@@ -69,11 +121,15 @@ const api = {
         }
       );
 
-    return this.handleResponse(response);
+    return this.handleResponse(
+      response
+    );
   },
 
 
-  async deleteExpense(expenseId) {
+  async deleteExpense(
+    expenseId
+  ) {
 
     const response =
       await fetch(
@@ -83,7 +139,9 @@ const api = {
         }
       );
 
-    return this.handleResponse(response);
+    return this.handleResponse(
+      response
+    );
   },
 
 
@@ -94,7 +152,9 @@ const api = {
         `/api/summary/month?month=${encodeURIComponent(month)}`
       );
 
-    return this.handleResponse(response);
+    return this.handleResponse(
+      response
+    );
   },
 
 
@@ -105,7 +165,9 @@ const api = {
         "/api/summary/category"
       );
 
-    return this.handleResponse(response);
+    return this.handleResponse(
+      response
+    );
   },
 
 
@@ -116,13 +178,16 @@ const api = {
         "/api/summary/payer"
       );
 
-    return this.handleResponse(response);
+    return this.handleResponse(
+      response
+    );
   },
 
 
   async handleResponse(response) {
 
     let data = null;
+
 
     try {
 
@@ -142,7 +207,8 @@ const api = {
 
 
       if (
-        typeof data.detail === "string"
+        typeof data.detail ===
+        "string"
       ) {
 
         message =
@@ -163,7 +229,9 @@ const api = {
       }
 
 
-      throw new Error(message);
+      throw new Error(
+        message
+      );
     }
 
 

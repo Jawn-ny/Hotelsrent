@@ -70,6 +70,114 @@ def test_search_expenses_by_keyword(client):
     assert len(note_response.json()) == 1
     assert note_response.json()[0]["item"] == "椅子"
 
+def test_filter_expenses_by_category_and_payer(client):
+    expenses = [
+        {
+            "date": "2026-08-12",
+            "item": "牛奶",
+            "amount": 10,
+            "category": "食品",
+            "payer": "A",
+            "note": "早餐"
+        },
+        {
+            "date": "2026-08-12",
+            "item": "面包",
+            "amount": 15,
+            "category": "食品",
+            "payer": "B",
+            "note": "早餐"
+        },
+        {
+            "date": "2026-08-12",
+            "item": "电饭煲",
+            "amount": 199,
+            "category": "家电",
+            "payer": "A",
+            "note": "厨房"
+        },
+        {
+            "date": "2026-08-12",
+            "item": "电风扇",
+            "amount": 120,
+            "category": "家电",
+            "payer": "B",
+            "note": "卧室"
+        }
+    ]
+
+    for expense in expenses:
+        response = client.post(
+            "/api/expenses",
+            json=expense
+        )
+
+        assert response.status_code == 201
+
+    category_response = client.get(
+        "/api/expenses?category=食品"
+    )
+
+    assert category_response.status_code == 200
+
+    category_data = category_response.json()
+
+    assert len(category_data) == 2
+
+    assert {
+        expense["item"]
+        for expense in category_data
+    } == {
+        "牛奶",
+        "面包"
+    }
+
+    payer_response = client.get(
+        "/api/expenses?payer=A"
+    )
+
+    assert payer_response.status_code == 200
+
+    payer_data = payer_response.json()
+
+    assert len(payer_data) == 2
+
+    assert {
+        expense["item"]
+        for expense in payer_data
+    } == {
+        "牛奶",
+        "电饭煲"
+    }
+
+    combined_response = client.get(
+        "/api/expenses?category=家电&payer=A"
+    )
+
+    assert combined_response.status_code == 200
+
+    combined_data = combined_response.json()
+
+    assert len(combined_data) == 1
+    assert combined_data[0]["item"] == "电饭煲"
+
+    search_and_filter_response = client.get(
+        "/api/expenses?keyword=电&category=家电&payer=B"
+    )
+
+    assert search_and_filter_response.status_code == 200
+
+    search_and_filter_data = (
+        search_and_filter_response.json()
+    )
+
+    assert len(search_and_filter_data) == 1
+
+    assert (
+        search_and_filter_data[0]["item"]
+        == "电风扇"
+    )
+
 def test_create_expense(client):
     expense_data = {
         "date": "2026-08-09",
