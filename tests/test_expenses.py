@@ -284,6 +284,116 @@ def test_sort_expenses(client):
 
     assert invalid_response.status_code == 422
 
+def test_paginate_expenses(client):
+    for index in range(1, 24):
+        expense = {
+            "date": "2026-08-13",
+            "item": f"记录{index:02d}",
+            "amount": index,
+            "category": "分页测试",
+            "payer": "A",
+            "note": ""
+        }
+
+        response = client.post(
+            "/api/expenses",
+            json=expense
+        )
+
+        assert response.status_code == 201
+
+    page_response = client.get(
+        "/api/expenses"
+        "?sort_by=amount"
+        "&sort_order=asc"
+        "&page=2"
+        "&page_size=10"
+    )
+
+    assert page_response.status_code == 200
+
+    data = page_response.json()
+
+    assert len(data) == 10
+
+    amounts = [
+        expense["amount"]
+        for expense in data
+    ]
+
+    assert amounts == [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+    ]
+
+    assert (
+        page_response.headers[
+            "x-total-count"
+        ]
+        == "23"
+    )
+
+    assert (
+        page_response.headers[
+            "x-total-pages"
+        ]
+        == "3"
+    )
+
+    assert (
+        page_response.headers[
+            "x-page"
+        ]
+        == "2"
+    )
+
+    assert (
+        page_response.headers[
+            "x-page-size"
+        ]
+        == "10"
+    )
+
+    last_page_response = client.get(
+        "/api/expenses"
+        "?sort_by=amount"
+        "&sort_order=asc"
+        "&page=3"
+        "&page_size=10"
+    )
+
+    assert last_page_response.status_code == 200
+
+    assert len(
+        last_page_response.json()
+    ) == 3
+
+    invalid_page_response = client.get(
+        "/api/expenses?page=0"
+    )
+
+    assert (
+        invalid_page_response.status_code
+        == 422
+    )
+
+    invalid_page_size_response = client.get(
+        "/api/expenses?page_size=101"
+    )
+
+    assert (
+        invalid_page_size_response.status_code
+        == 422
+    )
+
 def test_create_expense(client):
     expense_data = {
         "date": "2026-08-09",

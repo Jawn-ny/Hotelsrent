@@ -1,10 +1,13 @@
 const api = {
 
   async getHealth() {
+
     const response =
       await fetch("/api/health");
 
-    return this.handleResponse(response);
+    return this.handleResponse(
+      response
+    );
   },
 
 
@@ -13,7 +16,9 @@ const api = {
     category = "",
     payer = "",
     sortBy = "date",
-    sortOrder = "desc"
+    sortOrder = "desc",
+    page = 1,
+    pageSize = 10
   ) {
 
     const params =
@@ -31,6 +36,7 @@ const api = {
 
 
     if (cleanedKeyword) {
+
       params.set(
         "keyword",
         cleanedKeyword
@@ -39,6 +45,7 @@ const api = {
 
 
     if (cleanedCategory) {
+
       params.set(
         "category",
         cleanedCategory
@@ -47,6 +54,7 @@ const api = {
 
 
     if (cleanedPayer) {
+
       params.set(
         "payer",
         cleanedPayer
@@ -64,6 +72,16 @@ const api = {
       sortOrder
     );
 
+    params.set(
+      "page",
+      String(page)
+    );
+
+    params.set(
+      "page_size",
+      String(pageSize)
+    );
+
 
     const response =
       await fetch(
@@ -71,9 +89,48 @@ const api = {
       );
 
 
-    return this.handleResponse(
-      response
-    );
+    const items =
+      await this.handleResponse(
+        response
+      );
+
+
+    const total =
+      Number(
+        response.headers.get(
+          "X-Total-Count"
+        ) ?? items.length
+      );
+
+    const totalPages =
+      Number(
+        response.headers.get(
+          "X-Total-Pages"
+        ) ?? 1
+      );
+
+    const currentPage =
+      Number(
+        response.headers.get(
+          "X-Page"
+        ) ?? page
+      );
+
+    const currentPageSize =
+      Number(
+        response.headers.get(
+          "X-Page-Size"
+        ) ?? pageSize
+      );
+
+
+    return {
+      items,
+      total,
+      totalPages,
+      page: currentPage,
+      pageSize: currentPageSize
+    };
   },
 
 
@@ -128,7 +185,9 @@ const api = {
   },
 
 
-  async deleteExpense(expenseId) {
+  async deleteExpense(
+    expenseId
+  ) {
 
     const response =
       await fetch(
@@ -189,9 +248,12 @@ const api = {
 
 
     try {
+
       data =
         await response.json();
+
     } catch {
+
       data = {};
     }
 
@@ -206,6 +268,7 @@ const api = {
         typeof data.detail ===
         "string"
       ) {
+
         message =
           data.detail;
       }
@@ -213,6 +276,7 @@ const api = {
       else if (
         Array.isArray(data.detail)
       ) {
+
         message =
           data.detail
             .map(

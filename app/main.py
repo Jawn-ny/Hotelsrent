@@ -1,8 +1,8 @@
 from contextlib import asynccontextmanager
 
 from sqlmodel import Session, select
-from sqlalchemy import or_
-from fastapi import Depends, FastAPI, HTTPException, Query
+from sqlalchemy import func, or_
+from fastapi import Depends, FastAPI, HTTPException, Query, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
@@ -21,6 +21,7 @@ def health_check():
 
 @app.get("/api/expenses")
 def get_expenses(
+    response: Response,
     keyword: str | None = None,
     category: str | None = None,
     payer: str | None = None,
@@ -32,15 +33,31 @@ def get_expenses(
         "desc",
         pattern=r"^(asc|desc)$"
     ),
+    page: int = Query(
+        1,
+        ge=1
+    ),
+    page_size: int = Query(
+        10,
+        ge=1,
+        le=100
+    ),
     session: Session = Depends(get_session)
 ):
     statement = select(Expense)
+
+    count_statement = (
+        select(func.count())
+        .select_from(Expense)
+    )
+
+    conditions = []
 
     if keyword:
         keyword = keyword.strip()
 
         if keyword:
-            statement = statement.where(
+            conditions.append(
                 or_(
                     Expense.item.contains(keyword),
                     Expense.category.contains(keyword),
@@ -53,7 +70,7 @@ def get_expenses(
         category = category.strip()
 
         if category:
-            statement = statement.where(
+            conditions.append(
                 Expense.category == category
             )
 
@@ -61,9 +78,20 @@ def get_expenses(
         payer = payer.strip()
 
         if payer:
-            statement = statement.where(
+            conditions.append(
                 Expense.payer == payer
             )
+
+    for condition in conditions:
+        statement = statement.where(
+            condition
+        )
+
+        count_statement = (
+            count_statement.where(
+                condition
+            )
+        )
 
     sort_columns = {
         "date": Expense.date,
@@ -71,7 +99,9 @@ def get_expenses(
         "item": Expense.item
     }
 
-    sort_column = sort_columns[sort_by]
+    sort_column = sort_columns[
+        sort_by
+    ]
 
     if sort_order == "asc":
         statement = statement.order_by(
@@ -84,7 +114,43 @@ def get_expenses(
             Expense.id.desc()
         )
 
-    expenses = session.exec(statement).all()
+    total = session.exec(
+        count_statement
+    ).one()
+
+    total_pages = (
+        total + page_size - 1
+    ) // page_size
+
+    offset = (
+        page - 1
+    ) * page_size
+
+    statement = (
+        statement
+        .offset(offset)
+        .limit(page_size)
+    )
+
+    expenses = session.exec(
+        statement
+    ).all()
+
+    response.headers[
+        "X-Total-Count"
+    ] = str(total)
+
+    response.headers[
+        "X-Total-Pages"
+    ] = str(total_pages)
+
+    response.headers[
+        "X-Page"
+    ] = str(page)
+
+    response.headers[
+        "X-Page-Size"
+    ] = str(page_size)
 
     return expenses
     

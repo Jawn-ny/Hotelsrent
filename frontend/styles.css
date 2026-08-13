@@ -513,7 +513,8 @@ h2 {
   display:
     flex;
 
-  flex-wrap: wrap;
+  flex-wrap:
+    wrap;
 
   gap:
     12px;
@@ -589,10 +590,13 @@ h2 {
 
 .sketch-btn:disabled {
   opacity:
-    0.6;
+    0.5;
 
   cursor:
-    wait;
+    not-allowed;
+
+  transform:
+    none;
 }
 
 
@@ -681,7 +685,8 @@ h2 {
 
 .expense-form label,
 .month-summary-box label,
-.query-field {
+.query-field,
+.page-size-group {
   display:
     flex;
 
@@ -1039,6 +1044,73 @@ tbody tr:hover {
 
 
 
+.pagination-row {
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    1fr
+    auto;
+
+  gap:
+    18px;
+
+  align-items:
+    end;
+
+  margin-top:
+    20px;
+
+  padding:
+    16px;
+
+  border:
+    2px dashed
+    var(--line);
+
+  border-radius:
+    18px;
+
+  background:
+    #fff9f2;
+}
+
+
+
+.page-size-group {
+  min-width:
+    130px;
+}
+
+
+
+.pagination-info {
+  align-self:
+    center;
+
+  text-align:
+    center;
+
+  color:
+    var(--text-soft);
+
+  font-weight:
+    700;
+}
+
+
+
+.pagination-actions {
+  display:
+    flex;
+
+  gap:
+    10px;
+}
+
+
+
 .summary-item {
   display:
     flex;
@@ -1111,9 +1183,22 @@ tbody tr:hover {
 
   .search-row,
   .filter-row,
-  .sort-row {
+  .sort-row,
+  .pagination-row {
     grid-template-columns:
       1fr;
+  }
+
+
+  .pagination-info {
+    text-align:
+      left;
+  }
+
+
+  .pagination-actions {
+    flex-wrap:
+      wrap;
   }
 
 }
@@ -1149,6 +1234,12 @@ tbody tr:hover {
     align-items:
       flex-start;
 
+    flex-direction:
+      column;
+  }
+
+
+  .pagination-actions {
     flex-direction:
       column;
   }

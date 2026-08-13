@@ -133,10 +133,32 @@ const clearSortBtn =
     "clear-sort-btn"
   );
 
+const pageSizeEl =
+  document.getElementById(
+    "page-size"
+  );
+
+const paginationInfoEl =
+  document.getElementById(
+    "pagination-info"
+  );
+
+const previousPageBtn =
+  document.getElementById(
+    "previous-page-btn"
+  );
+
+const nextPageBtn =
+  document.getElementById(
+    "next-page-btn"
+  );
+
 
 let currentExpenses = [];
 
 let editingExpenseId = null;
+
+let currentPage = 1;
 
 
 
@@ -198,26 +220,31 @@ function renderHealthError(message) {
 
 
 
-function renderExpenses(expenses) {
+function renderExpenses(
+  expenses,
+  total
+) {
 
   currentExpenses =
     expenses;
 
 
   expenseCountEl.textContent =
-    `${expenses.length} 条记录`;
+    `本页 ${expenses.length} 条 / 共 ${total} 条`;
 
 
   if (!expenses.length) {
 
     expenseTableBodyEl.innerHTML = `
       <tr>
+
         <td
           colspan="8"
           class="empty-cell"
         >
           没有找到符合条件的支出记录
         </td>
+
       </tr>
     `;
 
@@ -282,6 +309,37 @@ function renderExpenses(expenses) {
         `;
       })
       .join("");
+}
+
+
+
+function renderPagination(data) {
+
+  if (data.total === 0) {
+
+    paginationInfoEl.textContent =
+      "暂无记录";
+
+    previousPageBtn.disabled =
+      true;
+
+    nextPageBtn.disabled =
+      true;
+
+    return;
+  }
+
+
+  paginationInfoEl.textContent =
+    `第 ${data.page} / ${data.totalPages} 页，共 ${data.total} 条`;
+
+
+  previousPageBtn.disabled =
+    data.page <= 1;
+
+
+  nextPageBtn.disabled =
+    data.page >= data.totalPages;
 }
 
 
@@ -392,6 +450,7 @@ function populateSelect(
   if (
     values.includes(currentValue)
   ) {
+
     selectElement.value =
       currentValue;
   }
@@ -510,13 +569,16 @@ function leaveEditMode() {
   editingExpenseId =
     null;
 
+
   expenseFormEl.reset();
+
 
   formTitleEl.textContent =
     "添加支出";
 
   submitExpenseBtn.textContent =
     "添加支出";
+
 
   editStatusEl.classList.add(
     "hidden"
@@ -554,32 +616,28 @@ async function loadFilterOptions() {
 
   try {
 
-    const allExpenses =
-      await api.getExpenses();
+    const [
+      categoryData,
+      payerData
+    ] =
+      await Promise.all([
+        api.getCategorySummary(),
+        api.getPayerSummary()
+      ]);
 
 
-    const categories = [
-      ...new Set(
-        allExpenses.map(
-          (expense) =>
-            expense.category
-        )
-      )
-    ]
-      .filter(Boolean)
-      .sort();
+    const categories =
+      Object.keys(
+        categoryData.category_totals
+        || {}
+      ).sort();
 
 
-    const payers = [
-      ...new Set(
-        allExpenses.map(
-          (expense) =>
-            expense.payer
-        )
-      )
-    ]
-      .filter(Boolean)
-      .sort();
+    const payers =
+      Object.keys(
+        payerData.payer_totals
+        || {}
+      ).sort();
 
 
     populateSelect(
@@ -627,25 +685,60 @@ async function loadExpenses() {
     const sortOrder =
       sortOrderEl.value;
 
+    const pageSize =
+      Number(
+        pageSizeEl.value
+      );
 
-    const expenses =
+
+    const data =
       await api.getExpenses(
         keyword,
         category,
         payer,
         sortBy,
-        sortOrder
+        sortOrder,
+        currentPage,
+        pageSize
       );
 
 
+    if (
+      data.totalPages > 0
+      &&
+      currentPage > data.totalPages
+    ) {
+
+      currentPage =
+        data.totalPages;
+
+      await loadExpenses();
+
+      return;
+    }
+
+
+    if (data.total === 0) {
+
+      currentPage = 1;
+    }
+
+
     renderExpenses(
-      expenses
+      data.items,
+      data.total
+    );
+
+
+    renderPagination(
+      data
     );
 
   } catch (error) {
 
     expenseTableBodyEl.innerHTML = `
       <tr>
+
         <td
           colspan="8"
           class="empty-cell"
@@ -653,13 +746,34 @@ async function loadExpenses() {
           加载失败：
           ${escapeHtml(error.message)}
         </td>
+
       </tr>
     `;
 
 
     expenseCountEl.textContent =
       "加载失败";
+
+
+    paginationInfoEl.textContent =
+      "分页加载失败";
+
+
+    previousPageBtn.disabled =
+      true;
+
+    nextPageBtn.disabled =
+      true;
   }
+}
+
+
+
+async function resetPageAndLoadExpenses() {
+
+  currentPage = 1;
+
+  await loadExpenses();
 }
 
 
@@ -679,6 +793,7 @@ async function loadCategorySummary() {
 
     const data =
       await api.getCategorySummary();
+
 
     renderSummaryList(
       categorySummaryEl,
@@ -704,6 +819,7 @@ async function loadPayerSummary() {
 
     const data =
       await api.getPayerSummary();
+
 
     renderSummaryList(
       payerSummaryEl,
@@ -740,6 +856,7 @@ async function refreshSelectedMonthSummary() {
 
 
   if (!monthValue) {
+
     return;
   }
 
@@ -750,6 +867,7 @@ async function refreshSelectedMonthSummary() {
       await api.getMonthSummary(
         monthValue
       );
+
 
     renderMonthSummary(
       data
@@ -799,10 +917,12 @@ expenseFormEl.addEventListener(
           payload
         );
 
+
         showMessage(
           "添加成功，已经保存到 SQLite 数据库。",
           "success"
         );
+
 
         expenseFormEl.reset();
 
@@ -814,7 +934,9 @@ expenseFormEl.addEventListener(
             payload
           );
 
+
         leaveEditMode();
+
 
         showMessage(
           `支出 #${updatedExpense.id} 修改成功。`,
@@ -822,6 +944,8 @@ expenseFormEl.addEventListener(
         );
       }
 
+
+      currentPage = 1;
 
       await refreshAllData();
 
@@ -917,6 +1041,7 @@ expenseTableBodyEl.addEventListener(
 
 
       if (!confirmed) {
+
         return;
       }
 
@@ -939,6 +1064,7 @@ expenseTableBodyEl.addEventListener(
           editingExpenseId ===
           expenseId
         ) {
+
           leaveEditMode();
         }
 
@@ -1037,6 +1163,7 @@ monthSummaryBtn.addEventListener(
           monthValue
         );
 
+
       renderMonthSummary(
         data
       );
@@ -1056,7 +1183,7 @@ monthSummaryBtn.addEventListener(
 
 searchExpensesBtn.addEventListener(
   "click",
-  loadExpenses
+  resetPageAndLoadExpenses
 );
 
 
@@ -1068,7 +1195,7 @@ clearSearchBtn.addEventListener(
     expenseSearchInputEl.value =
       "";
 
-    await loadExpenses();
+    await resetPageAndLoadExpenses();
   }
 );
 
@@ -1084,7 +1211,7 @@ expenseSearchInputEl.addEventListener(
 
       event.preventDefault();
 
-      await loadExpenses();
+      await resetPageAndLoadExpenses();
     }
   }
 );
@@ -1093,7 +1220,7 @@ expenseSearchInputEl.addEventListener(
 
 applyFilterBtn.addEventListener(
   "click",
-  loadExpenses
+  resetPageAndLoadExpenses
 );
 
 
@@ -1108,7 +1235,7 @@ clearFilterBtn.addEventListener(
     payerFilterEl.value =
       "";
 
-    await loadExpenses();
+    await resetPageAndLoadExpenses();
   }
 );
 
@@ -1116,7 +1243,7 @@ clearFilterBtn.addEventListener(
 
 applySortBtn.addEventListener(
   "click",
-  loadExpenses
+  resetPageAndLoadExpenses
 );
 
 
@@ -1130,6 +1257,51 @@ clearSortBtn.addEventListener(
 
     sortOrderEl.value =
       "desc";
+
+    await resetPageAndLoadExpenses();
+  }
+);
+
+
+
+pageSizeEl.addEventListener(
+  "change",
+  resetPageAndLoadExpenses
+);
+
+
+
+previousPageBtn.addEventListener(
+  "click",
+  async () => {
+
+    if (currentPage <= 1) {
+
+      return;
+    }
+
+
+    currentPage -= 1;
+
+    await loadExpenses();
+  }
+);
+
+
+
+nextPageBtn.addEventListener(
+  "click",
+  async () => {
+
+    if (
+      nextPageBtn.disabled
+    ) {
+
+      return;
+    }
+
+
+    currentPage += 1;
 
     await loadExpenses();
   }

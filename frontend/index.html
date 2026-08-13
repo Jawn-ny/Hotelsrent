@@ -17,6 +17,7 @@
   />
 </head>
 
+
 <body>
 
   <div class="page-shell">
@@ -317,7 +318,7 @@
       <div class="section-head">
 
         <h2>
-          全部支出记录
+          支出记录
         </h2>
 
         <span
@@ -525,6 +526,70 @@
           </tbody>
 
         </table>
+
+      </div>
+
+
+      <div class="pagination-row">
+
+        <label class="page-size-group">
+
+          <span>
+            每页显示
+          </span>
+
+          <select id="page-size">
+
+            <option value="5">
+              5 条
+            </option>
+
+            <option
+              value="10"
+              selected
+            >
+              10 条
+            </option>
+
+            <option value="20">
+              20 条
+            </option>
+
+            <option value="50">
+              50 条
+            </option>
+
+          </select>
+
+        </label>
+
+
+        <div
+          id="pagination-info"
+          class="pagination-info"
+        >
+          第 1 / 1 页
+        </div>
+
+
+        <div class="pagination-actions">
+
+          <button
+            id="previous-page-btn"
+            class="sketch-btn light-btn"
+          >
+            上一页
+          </button>
+
+
+          <button
+            id="next-page-btn"
+            class="sketch-btn"
+          >
+            下一页
+          </button>
+
+        </div>
 
       </div>
 

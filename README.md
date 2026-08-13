@@ -55,25 +55,17 @@ SQLite + SQLModel
 GET /api/expenses?keyword=电
 ```
 
-如果不传关键词：
-
-```text
-GET /api/expenses
-```
-
-则返回全部记录。
-
 ---
 
 # 筛选功能
 
-支持按照分类：
+按分类筛选：
 
 ```text
 GET /api/expenses?category=家电
 ```
 
-按照付款人：
+按付款人筛选：
 
 ```text
 GET /api/expenses?payer=A
@@ -85,7 +77,7 @@ GET /api/expenses?payer=A
 GET /api/expenses?category=家电&payer=A
 ```
 
-搜索与筛选也可以组合：
+搜索与筛选可以组合：
 
 ```text
 GET /api/expenses?keyword=电&category=家电&payer=A
@@ -95,7 +87,7 @@ GET /api/expenses?keyword=电&category=家电&payer=A
 
 # 排序功能
 
-支出列表支持按照以下字段排序：
+支持按照以下字段排序：
 
 - 日期 `date`
 - 金额 `amount`
@@ -103,34 +95,172 @@ GET /api/expenses?keyword=电&category=家电&payer=A
 
 排序方向：
 
-- 升序 `asc`
-- 降序 `desc`
+```text
+asc
+desc
+```
 
-例如按金额从低到高：
+例如：
 
 ```text
 GET /api/expenses?sort_by=amount&sort_order=asc
 ```
 
-按日期从新到旧：
-
-```text
-GET /api/expenses?sort_by=date&sort_order=desc
-```
-
-默认排序：
+默认：
 
 ```text
 sort_by=date
 sort_order=desc
 ```
 
-所以默认情况下，日期较新的支出显示在前面。
+也就是日期较新的记录优先显示。
 
-排序可以和搜索、筛选组合：
+---
+
+# 分页功能
+
+支出列表支持分页。
+
+分页参数：
 
 ```text
-GET /api/expenses?keyword=电&category=家电&sort_by=amount&sort_order=asc
+page
+page_size
+```
+
+默认：
+
+```text
+page=1
+page_size=10
+```
+
+例如获取第一页：
+
+```text
+GET /api/expenses?page=1&page_size=10
+```
+
+第二页：
+
+```text
+GET /api/expenses?page=2&page_size=10
+```
+
+`page` 必须大于等于：
+
+```text
+1
+```
+
+`page_size` 范围：
+
+```text
+1 - 100
+```
+
+后端使用数据库：
+
+```text
+OFFSET
+LIMIT
+```
+
+实现真正的分页查询。
+
+例如：
+
+```text
+page=3
+page_size=10
+```
+
+计算：
+
+```text
+offset = (3 - 1) × 10
+       = 20
+```
+
+表示跳过前 20 条记录，再读取最多 10 条。
+
+---
+
+# 分页响应信息
+
+`GET /api/expenses` 的 JSON Body 仍然是支出数组。
+
+例如：
+
+```json
+[
+  {
+    "id": 20,
+    "date": "2026-08-13",
+    "item": "电饭煲",
+    "amount": 199,
+    "category": "家电",
+    "payer": "A",
+    "note": ""
+  }
+]
+```
+
+分页元数据通过 HTTP Response Header 返回。
+
+包括：
+
+```text
+X-Total-Count
+X-Total-Pages
+X-Page
+X-Page-Size
+```
+
+例如：
+
+```text
+X-Total-Count: 23
+X-Total-Pages: 3
+X-Page: 2
+X-Page-Size: 10
+```
+
+表示：
+
+```text
+符合条件的数据共 23 条
+总共 3 页
+当前是第 2 页
+每页 10 条
+```
+
+---
+
+# 搜索 + 筛选 + 排序 + 分页
+
+四个功能可以同时工作。
+
+例如：
+
+```text
+GET /api/expenses?keyword=电&category=家电&payer=A&sort_by=amount&sort_order=asc&page=1&page_size=10
+```
+
+查询顺序可以理解为：
+
+```text
+数据库中的全部支出
+↓
+搜索 keyword
+↓
+筛选 category / payer
+↓
+排序 order_by
+↓
+分页 offset / limit
+↓
+返回当前页
 ```
 
 ---
@@ -254,7 +384,7 @@ HOTELSRENT/
 python -m venv .venv
 ```
 
-这个命令只用于创建虚拟环境，一般不需要重复执行。
+只需要在虚拟环境不存在时创建。
 
 ## 激活虚拟环境
 
@@ -264,7 +394,7 @@ Windows PowerShell：
 .\.venv\Scripts\Activate.ps1
 ```
 
-成功后终端前面会出现：
+成功：
 
 ```text
 (.venv)
@@ -280,19 +410,19 @@ python -m pip install -r requirements.txt
 
 # 启动项目
 
-使用：
+开发启动命令：
 
 ```powershell
 fastapi dev --entrypoint app.main:app
 ```
 
-打开网页：
+网页：
 
 ```text
 http://127.0.0.1:8000
 ```
 
-Swagger API 文档：
+Swagger：
 
 ```text
 http://127.0.0.1:8000/docs
@@ -312,8 +442,16 @@ GET /api/health
 
 ## 获取支出
 
+默认：
+
 ```text
 GET /api/expenses
+```
+
+等价于：
+
+```text
+GET /api/expenses?page=1&page_size=10&sort_by=date&sort_order=desc
 ```
 
 ---
@@ -345,7 +483,7 @@ GET /api/expenses?payer=A
 ## 排序
 
 ```text
-GET /api/expenses?sort_by=date&sort_order=desc
+GET /api/expenses?sort_by=amount&sort_order=asc
 ```
 
 支持：
@@ -365,18 +503,28 @@ asc
 desc
 ```
 
-非法排序参数会返回：
+---
+
+## 分页
 
 ```text
-422 Unprocessable Entity
+GET /api/expenses?page=2&page_size=10
+```
+
+支持：
+
+```text
+page >= 1
+
+1 <= page_size <= 100
 ```
 
 ---
 
-## 搜索 + 筛选 + 排序
+## 完整组合
 
 ```text
-GET /api/expenses?keyword=电&category=家电&payer=A&sort_by=amount&sort_order=asc
+GET /api/expenses?keyword=电&category=家电&payer=A&sort_by=amount&sort_order=asc&page=1&page_size=10
 ```
 
 ---
@@ -440,8 +588,11 @@ DELETE /api/expenses/{expense_id}
 - 分类不能为空
 - 付款人不能为空
 - 必填文本自动清除首尾空格
-- 非法请求由 FastAPI / Pydantic 返回 422
-- 非法排序字段或排序方向返回 422
+- 非法搜索/请求参数由 FastAPI 返回 422
+- 非法排序字段返回 422
+- 非法排序方向返回 422
+- page 小于 1 返回 422
+- page_size 小于 1 或大于 100 返回 422
 
 ---
 
@@ -453,7 +604,7 @@ DELETE /api/expenses/{expense_id}
 data/expenses.db
 ```
 
-数据库文件不提交到 Git。
+数据库文件不提交 Git。
 
 `.gitignore` 忽略：
 
@@ -473,15 +624,15 @@ data/*.db-wal
 data/expenses.json
 ```
 
-Web 版本已经不再使用 JSON 作为正式运行数据库。
+当前 Web 版本不再使用 JSON 作为正式数据库。
 
-JSON 文件现在主要作为：
+JSON 主要保留作为：
 
-- 历史数据
+- 项目历史数据
 - 文件读写学习记录
-- SQLite 数据迁移来源
+- SQLite 迁移来源
 
-旧数据迁移：
+迁移：
 
 ```powershell
 python migrate_json_to_db.py
@@ -490,8 +641,6 @@ python migrate_json_to_db.py
 ---
 
 # 自动化测试
-
-项目使用 pytest。
 
 运行：
 
@@ -507,53 +656,59 @@ python -m pytest -v
 - 非法金额
 - 空文本字段
 - 修改支出
-- 修改不存在的记录
+- 修改不存在记录
 - 修改非法金额
 - 删除支出
-- 删除不存在的记录
+- 删除不存在记录
 - 月份统计
 - 分类统计
 - 付款人统计
 - 关键词搜索
 - 分类筛选
 - 付款人筛选
-- 搜索与筛选组合
+- 搜索和筛选组合
 - 日期排序
 - 金额排序
 - 搜索 + 筛选 + 排序
 - 非法排序参数
+- 分页
+- 分页总数量
+- 分页总页数
+- 非法分页参数
 
-排序功能完成后预期：
+分页完成后预期：
 
 ```text
-18 passed
+19 passed
 ```
 
 ---
 
 # 测试数据库隔离
 
-pytest 使用独立 SQLite 内存数据库：
+pytest 使用：
 
 ```text
 sqlite://
 ```
 
-通过：
+作为独立 SQLite 内存数据库。
+
+通过 FastAPI：
 
 ```text
 dependency_overrides
 ```
 
-把正式数据库 Session 替换成测试 Session。
+替换正式数据库 Session。
 
-因此运行：
+因此：
 
 ```powershell
 python -m pytest -v
 ```
 
-不会修改：
+不会影响：
 
 ```text
 data/expenses.db
@@ -563,9 +718,9 @@ data/expenses.db
 
 # CI
 
-项目已经使用 GitHub Actions 实现 CI。
+项目使用 GitHub Actions。
 
-工作流：
+配置：
 
 ```text
 .github/workflows/tests.yml
@@ -577,25 +732,23 @@ data/expenses.db
 git push
 ```
 
-或者 Pull Request 后，GitHub Actions 会：
+或者 Pull Request 时：
 
 ```text
-Checkout 代码
+Checkout
 ↓
-创建 Python 环境
+Python 3.10
 ↓
 安装 requirements.txt
 ↓
-运行 pytest
+pytest
 ↓
-判断自动化测试是否通过
+CI 结果
 ```
 
 CI 绿色表示：
 
-> 当前版本通过了项目目前配置的所有自动化检查。
-
-并不代表程序绝对不存在 Bug。
+> 当前提交通过了项目配置的自动化测试。
 
 ---
 
@@ -615,7 +768,7 @@ GitHub Actions CI           ✅
 搜索                        ✅
 筛选                        ✅
 排序                        ✅
-分页                        ⏳
+分页                        ✅
 
 月度预算                    ⏳
 
@@ -624,33 +777,37 @@ CD / 公网部署               暂不实施
 
 ---
 
-# 下一阶段
+# 当前阶段状态
 
-当前固定开发顺序：
+搜索、筛选、排序、分页阶段已经完成：
 
 ```text
-1. 搜索       ✅
-2. 筛选       ✅
-3. 排序       ✅
-4. 分页       ← 下一步
-5. 月度预算
+搜索
+↓
+筛选
+↓
+排序
+↓
+分页
+```
+
+下一阶段：
+
+```text
+月度预算
 ```
 
 ---
 
 # Git 开发流程
 
-每完成一个功能：
+分页功能完成后检查：
 
 ```powershell
 git status
 ```
 
-确认修改内容。
-
-然后只暂存相关文件。
-
-例如排序功能：
+暂存：
 
 ```powershell
 git add app/main.py tests/test_expenses.py frontend/index.html frontend/styles.css frontend/api.js frontend/app.js README.md
@@ -659,7 +816,7 @@ git add app/main.py tests/test_expenses.py frontend/index.html frontend/styles.c
 提交：
 
 ```powershell
-git commit -m "feat: add expense sorting"
+git commit -m "feat: add expense pagination"
 ```
 
 推送：
@@ -668,48 +825,56 @@ git commit -m "feat: add expense sorting"
 git push
 ```
 
-最后确认 GitHub Actions CI 通过。
+最后检查 GitHub Actions。
 
 ---
 
 # 项目学习目标
 
-这个项目用于练习：
+项目目前已经练习：
 
 ```text
 需求分析
 ↓
-功能拆分
+项目结构
 ↓
-数据模型
+FastAPI
 ↓
 REST API
 ↓
-数据库查询
+SQLite
+↓
+SQLModel
 ↓
 CRUD
 ↓
-搜索
+搜索 where / contains
 ↓
-筛选
+筛选 where
 ↓
-排序
+排序 order_by
 ↓
-自动化测试
+分页 offset / limit
+↓
+pytest
 ↓
 Git
 ↓
-CI
+GitHub Actions CI
+↓
+README
 ↓
 项目交付
 ```
 
-最终目标是能够自己解释：
+最终需要能够解释：
 
-- API 的输入和输出
-- 数据库如何保存数据
-- `where()` 如何筛选数据
-- `order_by()` 如何排序数据
+- `where()` 为什么负责筛选
+- `order_by()` 为什么负责排序
+- `offset()` 为什么负责跳过记录
+- `limit()` 为什么限制当前页数量
+- page 和 page_size 如何计算 offset
+- 为什么分页还需要查询 total
+- HTTP Header 如何传递分页元数据
 - pytest 为什么不会污染正式数据库
-- CI 如何检查代码回归
-- 搜索、筛选和排序如何组合
+- CI 如何检查回归问题
