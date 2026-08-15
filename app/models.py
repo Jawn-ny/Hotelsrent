@@ -26,3 +26,21 @@ class Expense(ExpenseBase, table=True):
 
 class ExpenseCreate(ExpenseBase):
     pass
+
+class Budget(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    month: str = Field(unique=True)
+    amount: float = Field(gt=0)
+
+class BudgetCreate(SQLModel):
+    month: str
+    amount: float = Field(gt=0)
+
+class BudgetSummary(SQLModel):
+    month: str
+    budget: float
+    spent: float
+    remaining: float
+
+class BudgetUpdate(SQLModel):
+    amount: float = Field(gt=0)

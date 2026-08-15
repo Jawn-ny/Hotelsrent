@@ -22,6 +22,10 @@
 
   <div class="page-shell">
 
+    <!-- ========================= -->
+    <!-- 顶部 Hero -->
+    <!-- ========================= -->
+
     <header class="hero-card">
 
       <div class="hero-left">
@@ -61,22 +65,524 @@
 
         <div class="cat-card">
 
-          <div class="cat-face">
+          <!--
+            这里不再使用原来几个 CSS 几何图形拼猫脸，
+            改成一个更完整的 SVG 卡通布偶猫。
+          -->
 
-            <div class="ear left-ear"></div>
-            <div class="ear right-ear"></div>
+          <svg
+            class="ragdoll-cat"
+            viewBox="0 0 320 250"
+            role="img"
+            aria-label="卡通布偶猫记账小助手"
+          >
 
-            <div class="eye left-eye"></div>
-            <div class="eye right-eye"></div>
+            <defs>
 
-            <div class="nose"></div>
-            <div class="mouth"></div>
+              <!-- 身体毛色 -->
+              <linearGradient
+                id="catFur"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop
+                  offset="0%"
+                  stop-color="#ffffff"
+                />
+
+                <stop
+                  offset="100%"
+                  stop-color="#f2eee8"
+                />
+              </linearGradient>
+
+
+              <!-- 布偶猫蓝灰色面罩 -->
+              <linearGradient
+                id="catMask"
+                x1="0"
+                y1="0"
+                x2="1"
+                y2="1"
+              >
+                <stop
+                  offset="0%"
+                  stop-color="#91abc2"
+                />
+
+                <stop
+                  offset="100%"
+                  stop-color="#6f8ca8"
+                />
+              </linearGradient>
+
+
+              <!-- 耳朵 -->
+              <linearGradient
+                id="catEar"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop
+                  offset="0%"
+                  stop-color="#b7c9d9"
+                />
+
+                <stop
+                  offset="100%"
+                  stop-color="#829eb7"
+                />
+              </linearGradient>
+
+
+              <!-- 蓝眼睛 -->
+              <radialGradient
+                id="catEye"
+                cx="45%"
+                cy="35%"
+                r="70%"
+              >
+                <stop
+                  offset="0%"
+                  stop-color="#dff7ff"
+                />
+
+                <stop
+                  offset="45%"
+                  stop-color="#72c8f1"
+                />
+
+                <stop
+                  offset="100%"
+                  stop-color="#3188c7"
+                />
+              </radialGradient>
+
+
+              <!-- 阴影 -->
+              <filter
+                id="softShadow"
+                x="-30%"
+                y="-30%"
+                width="160%"
+                height="180%"
+              >
+                <feDropShadow
+                  dx="0"
+                  dy="8"
+                  stdDeviation="7"
+                  flood-color="#8d6c58"
+                  flood-opacity="0.18"
+                />
+              </filter>
+
+            </defs>
+
+
+            <g filter="url(#softShadow)">
+
+              <!-- 尾巴 -->
+              <path
+                class="cat-tail"
+                d="M238 190 C294 174 302 214 274 225 C257 232 243 220 254 210 C262 203 270 210 266 215"
+                fill="none"
+                stroke="#91abc2"
+                stroke-width="18"
+                stroke-linecap="round"
+              />
+
+
+              <!-- 身体 -->
+              <ellipse
+                cx="160"
+                cy="191"
+                rx="89"
+                ry="48"
+                fill="url(#catFur)"
+                stroke="#c9ab90"
+                stroke-width="4"
+              />
+
+
+              <!-- 左耳 -->
+              <path
+                d="M93 85 L76 27 Q73 17 84 22 L124 48 Z"
+                fill="url(#catEar)"
+                stroke="#c9ab90"
+                stroke-width="4"
+                stroke-linejoin="round"
+              />
+
+
+              <!-- 右耳 -->
+              <path
+                d="M227 85 L244 27 Q247 17 236 22 L196 48 Z"
+                fill="url(#catEar)"
+                stroke="#c9ab90"
+                stroke-width="4"
+                stroke-linejoin="round"
+              />
+
+
+              <!-- 左耳内部 -->
+              <path
+                d="M88 78 L82 39 L113 58 Z"
+                fill="#efbcc5"
+                opacity="0.78"
+              />
+
+
+              <!-- 右耳内部 -->
+              <path
+                d="M232 78 L238 39 L207 58 Z"
+                fill="#efbcc5"
+                opacity="0.78"
+              />
+
+
+              <!-- 脸 -->
+              <path
+                d="
+                  M160 39
+                  C105 39 77 76 79 124
+                  C81 171 112 198 160 198
+                  C208 198 239 171 241 124
+                  C243 76 215 39 160 39
+                  Z
+                "
+                fill="url(#catFur)"
+                stroke="#c9ab90"
+                stroke-width="4"
+              />
+
+
+              <!-- 额头面罩 -->
+              <path
+                d="
+                  M112 66
+                  C124 51 141 45 160 45
+                  C179 45 196 51 208 66
+                  C197 74 189 84 185 96
+                  C176 88 168 84 160 84
+                  C152 84 144 88 135 96
+                  C131 84 123 74 112 66
+                  Z
+                "
+                fill="url(#catMask)"
+                opacity="0.96"
+              />
+
+
+              <!-- 左脸蓝灰毛 -->
+              <path
+                d="
+                  M103 78
+                  C87 93 86 119 95 136
+                  C105 155 125 158 137 142
+                  C143 133 143 117 135 97
+                  C127 80 116 72 103 78
+                  Z
+                "
+                fill="#8ea8bf"
+                opacity="0.88"
+              />
+
+
+              <!-- 右脸蓝灰毛 -->
+              <path
+                d="
+                  M217 78
+                  C233 93 234 119 225 136
+                  C215 155 195 158 183 142
+                  C177 133 177 117 185 97
+                  C193 80 204 72 217 78
+                  Z
+                "
+                fill="#8ea8bf"
+                opacity="0.88"
+              />
+
+
+              <!-- 鼻梁白毛 -->
+              <path
+                d="
+                  M143 97
+                  C149 92 154 90 160 90
+                  C166 90 171 92 177 97
+                  C174 116 174 128 160 137
+                  C146 128 146 116 143 97
+                  Z
+                "
+                fill="#edf3f7"
+                opacity="0.95"
+              />
+
+
+              <!-- 左眼 -->
+              <ellipse
+                cx="125"
+                cy="112"
+                rx="16"
+                ry="18"
+                fill="url(#catEye)"
+                stroke="#55738c"
+                stroke-width="3"
+              />
+
+
+              <!-- 右眼 -->
+              <ellipse
+                cx="195"
+                cy="112"
+                rx="16"
+                ry="18"
+                fill="url(#catEye)"
+                stroke="#55738c"
+                stroke-width="3"
+              />
+
+
+              <!-- 瞳孔 -->
+              <ellipse
+                cx="127"
+                cy="113"
+                rx="5"
+                ry="11"
+                fill="#2f4050"
+              />
+
+              <ellipse
+                cx="193"
+                cy="113"
+                rx="5"
+                ry="11"
+                fill="#2f4050"
+              />
+
+
+              <!-- 眼睛高光 -->
+              <circle
+                cx="122"
+                cy="105"
+                r="4"
+                fill="#ffffff"
+              />
+
+              <circle
+                cx="188"
+                cy="105"
+                r="4"
+                fill="#ffffff"
+              />
+
+
+              <!-- 鼻子 -->
+              <path
+                d="
+                  M151 137
+                  Q160 131 169 137
+                  Q168 146 160 148
+                  Q152 146 151 137
+                  Z
+                "
+                fill="#eaa5ae"
+                stroke="#bf7f88"
+                stroke-width="2"
+              />
+
+
+              <!-- 嘴巴左边 -->
+              <path
+                d="M160 148 C158 156 151 158 145 157"
+                fill="none"
+                stroke="#8d6c58"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+
+
+              <!-- 嘴巴右边 -->
+              <path
+                d="M160 148 C162 156 169 158 175 157"
+                fill="none"
+                stroke="#8d6c58"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+
+
+              <!-- 胡须 -->
+              <g
+                fill="none"
+                stroke="#a58a78"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                opacity="0.8"
+              >
+
+                <path
+                  d="M139 142 L103 136"
+                />
+
+                <path
+                  d="M138 149 L98 151"
+                />
+
+                <path
+                  d="M181 142 L217 136"
+                />
+
+                <path
+                  d="M182 149 L222 151"
+                />
+
+              </g>
+
+
+              <!-- 腮红 -->
+              <ellipse
+                cx="112"
+                cy="139"
+                rx="10"
+                ry="6"
+                fill="#f5c4c8"
+                opacity="0.55"
+              />
+
+              <ellipse
+                cx="208"
+                cy="139"
+                rx="10"
+                ry="6"
+                fill="#f5c4c8"
+                opacity="0.55"
+              />
+
+
+              <!-- 左前爪 -->
+              <path
+                d="
+                  M119 180
+                  C116 203 125 223 146 225
+                  L147 185
+                  Z
+                "
+                fill="#ffffff"
+                stroke="#c9ab90"
+                stroke-width="4"
+              />
+
+
+              <!-- 右前爪 -->
+              <path
+                d="
+                  M201 180
+                  C204 203 195 223 174 225
+                  L173 185
+                  Z
+                "
+                fill="#ffffff"
+                stroke="#c9ab90"
+                stroke-width="4"
+              />
+
+
+              <!-- 爪子细节 -->
+              <path
+                d="M129 221 Q139 229 148 222"
+                fill="none"
+                stroke="#d8b8a0"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+
+              <path
+                d="M172 222 Q181 229 191 221"
+                fill="none"
+                stroke="#d8b8a0"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+
+            </g>
+
+
+            <!-- 小配件 -->
+            <g class="cat-accessories">
+
+              <!-- 记账本 -->
+              <rect
+                x="20"
+                y="165"
+                width="58"
+                height="42"
+                rx="9"
+                fill="#fff4cf"
+                stroke="#d6ad67"
+                stroke-width="3"
+                transform="rotate(-7 49 186)"
+              />
+
+              <path
+                d="M31 180 L63 176"
+                stroke="#d6ad67"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+
+              <path
+                d="M33 191 L58 188"
+                stroke="#d6ad67"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+
+
+              <!-- 金币 -->
+              <circle
+                cx="272"
+                cy="166"
+                r="22"
+                fill="#ffd36a"
+                stroke="#d8a23c"
+                stroke-width="4"
+              />
+
+              <text
+                x="272"
+                y="174"
+                text-anchor="middle"
+                font-size="23"
+                font-weight="800"
+                fill="#9d6d1c"
+              >
+                ¥
+              </text>
+
+            </g>
+
+          </svg>
+
+
+          <div class="cat-note-wrap">
+
+            <span class="cat-sparkle">
+              ✦
+            </span>
+
+            <p class="cat-note">
+              布偶猫记账小助手
+            </p>
+
+            <span class="cat-sparkle">
+              ✦
+            </span>
 
           </div>
-
-          <p class="cat-note">
-            布偶猫记账小助手
-          </p>
 
         </div>
 
@@ -84,6 +590,11 @@
 
     </header>
 
+
+
+    <!-- ========================= -->
+    <!-- 后端状态 / 快捷操作 -->
+    <!-- ========================= -->
 
     <section class="status-row">
 
@@ -118,6 +629,7 @@
             刷新支出列表
           </button>
 
+
           <button
             id="refresh-summary-btn"
             class="sketch-btn cool-btn"
@@ -132,7 +644,200 @@
     </section>
 
 
+
+    <!-- ========================= -->
+    <!-- 月度预算 -->
+    <!-- ========================= -->
+
+    <section class="panel budget-panel">
+
+      <div class="section-head">
+
+        <div>
+
+          <p class="section-kicker">
+            MONTHLY BUDGET
+          </p>
+
+          <h2>
+            月度预算
+          </h2>
+
+        </div>
+
+
+        <span
+          id="budget-status-badge"
+          class="budget-status-badge neutral"
+        >
+          未查询
+        </span>
+
+      </div>
+
+
+      <div class="budget-layout">
+
+        <!-- 左边：预算设置 -->
+
+        <div class="budget-controls">
+
+          <label>
+
+            预算月份
+
+            <input
+              type="month"
+              id="budget-month"
+            />
+
+          </label>
+
+
+          <label>
+
+            预算金额
+
+            <input
+              type="number"
+              id="budget-amount-input"
+              min="0.01"
+              step="0.01"
+              placeholder="例如：3000"
+            />
+
+          </label>
+
+
+          <div class="button-group">
+
+            <button
+              id="save-budget-btn"
+              class="sketch-btn"
+            >
+              保存 / 修改预算
+            </button>
+
+
+            <button
+              id="refresh-budget-btn"
+              class="sketch-btn cool-btn"
+            >
+              查询预算
+            </button>
+
+          </div>
+
+
+          <p
+            id="budget-message"
+            class="message"
+          ></p>
+
+        </div>
+
+
+        <!-- 右边：预算结果 -->
+
+        <div class="budget-dashboard">
+
+          <div class="budget-stat-card">
+
+            <span class="budget-stat-label">
+              本月预算
+            </span>
+
+            <strong
+              id="budget-total-value"
+              class="budget-stat-value"
+            >
+              ¥ --
+            </strong>
+
+          </div>
+
+
+          <div class="budget-stat-card">
+
+            <span class="budget-stat-label">
+              已支出
+            </span>
+
+            <strong
+              id="budget-spent-value"
+              class="budget-stat-value"
+            >
+              ¥ --
+            </strong>
+
+          </div>
+
+
+          <div class="budget-stat-card">
+
+            <span class="budget-stat-label">
+              剩余预算
+            </span>
+
+            <strong
+              id="budget-remaining-value"
+              class="budget-stat-value"
+            >
+              ¥ --
+            </strong>
+
+          </div>
+
+
+          <div class="budget-progress-card">
+
+            <div class="budget-progress-head">
+
+              <span>
+                预算使用率
+              </span>
+
+              <strong id="budget-progress-text">
+                --%
+              </strong>
+
+            </div>
+
+
+            <div class="budget-progress-track">
+
+              <div
+                id="budget-progress-bar"
+                class="budget-progress-bar"
+              ></div>
+
+            </div>
+
+
+            <p
+              id="budget-hint"
+              class="budget-hint"
+            >
+              选择月份后即可查看预算使用情况。
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ========================= -->
+    <!-- 添加支出 + 月份统计 -->
+    <!-- ========================= -->
+
     <section class="content-grid">
+
+      <!-- 添加 / 编辑支出 -->
 
       <div class="panel">
 
@@ -141,6 +846,7 @@
           <h2 id="form-title">
             添加支出
           </h2>
+
 
           <span
             id="edit-status"
@@ -160,6 +866,7 @@
           <div class="form-grid">
 
             <label>
+
               日期
 
               <input
@@ -167,10 +874,12 @@
                 id="date"
                 required
               />
+
             </label>
 
 
             <label>
+
               物品
 
               <input
@@ -179,10 +888,12 @@
                 placeholder="例如：电饭煲"
                 required
               />
+
             </label>
 
 
             <label>
+
               金额
 
               <input
@@ -193,10 +904,12 @@
                 placeholder="例如：199"
                 required
               />
+
             </label>
 
 
             <label>
+
               分类
 
               <input
@@ -205,10 +918,12 @@
                 placeholder="例如：家电"
                 required
               />
+
             </label>
 
 
             <label>
+
               付款人
 
               <input
@@ -217,10 +932,12 @@
                 placeholder="例如：A"
                 required
               />
+
             </label>
 
 
             <label class="full-width">
+
               备注
 
               <input
@@ -228,6 +945,7 @@
                 id="note"
                 placeholder="例如：租房购买"
               />
+
             </label>
 
           </div>
@@ -273,21 +991,27 @@
       </div>
 
 
+
+      <!-- 月份统计 -->
+
       <div class="panel">
 
         <h2>
           按月份统计
         </h2>
 
+
         <div class="month-summary-box">
 
           <label>
+
             选择月份
 
             <input
               type="month"
               id="summary-month"
             />
+
           </label>
 
 
@@ -313,6 +1037,11 @@
     </section>
 
 
+
+    <!-- ========================= -->
+    <!-- 支出列表 -->
+    <!-- ========================= -->
+
     <section class="panel">
 
       <div class="section-head">
@@ -320,6 +1049,7 @@
         <h2>
           支出记录
         </h2>
+
 
         <span
           id="expense-count"
@@ -331,7 +1061,12 @@
       </div>
 
 
+
+      <!-- 搜索 / 筛选 / 排序 -->
+
       <div class="query-panel">
+
+        <!-- 搜索 -->
 
         <div class="search-row">
 
@@ -367,6 +1102,9 @@
 
         </div>
 
+
+
+        <!-- 筛选 -->
 
         <div class="filter-row">
 
@@ -421,6 +1159,9 @@
 
         </div>
 
+
+
+        <!-- 排序 -->
 
         <div class="sort-row">
 
@@ -490,6 +1231,9 @@
       </div>
 
 
+
+      <!-- 表格 -->
+
       <div class="table-wrap">
 
         <table>
@@ -497,14 +1241,23 @@
           <thead>
 
             <tr>
+
               <th>ID</th>
+
               <th>日期</th>
+
               <th>物品</th>
+
               <th>金额</th>
+
               <th>分类</th>
+
               <th>付款人</th>
+
               <th>备注</th>
+
               <th>操作</th>
+
             </tr>
 
           </thead>
@@ -529,6 +1282,9 @@
 
       </div>
 
+
+
+      <!-- 分页 -->
 
       <div class="pagination-row">
 
@@ -596,6 +1352,11 @@
     </section>
 
 
+
+    <!-- ========================= -->
+    <!-- 分类 / 付款人统计 -->
+    <!-- ========================= -->
+
     <section class="summary-grid">
 
       <div class="panel">
@@ -635,6 +1396,7 @@
 
 
   <script src="/frontend/api.js"></script>
+
   <script src="/frontend/app.js"></script>
 
 </body>

@@ -769,3 +769,193 @@ def test_summary_by_payer(client):
     assert data["payer_totals"]["A"] == 25
     assert data["payer_totals"]["B"] == 20
 
+def test_create_budget(client):
+    response = client.post(
+        "/api/budgets",
+        json={
+            "month": "2026-08",
+            "amount": 3000
+        }
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["month"] == "2026-08"
+    assert data["amount"] == 3000
+    assert data["id"] is not None
+
+
+def test_create_duplicate_budget(client):
+    first_response = client.post(
+        "/api/budgets",
+        json={
+            "month": "2026-08",
+            "amount": 3000
+        }
+    )
+
+    assert first_response.status_code == 200
+
+    second_response = client.post(
+        "/api/budgets",
+        json={
+            "month": "2026-08",
+            "amount": 5000
+        }
+    )
+
+    assert second_response.status_code == 400
+
+    assert second_response.json() == {
+        "detail": "该月份已经设置过预算"
+    }
+
+
+def test_get_budget(client):
+    create_response = client.post(
+        "/api/budgets",
+        json={
+            "month": "2026-09",
+            "amount": 4000
+        }
+    )
+
+    assert create_response.status_code == 200
+
+    response = client.get(
+        "/api/budgets/2026-09"
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["month"] == "2026-09"
+    assert data["amount"] == 4000
+
+
+def test_get_budget_not_found(client):
+    response = client.get(
+        "/api/budgets/2099-01"
+    )
+
+    assert response.status_code == 404
+
+    assert response.json() == {
+        "detail": "该月份还没有设置预算"
+    }
+
+
+def test_update_budget(client):
+    create_response = client.post(
+        "/api/budgets",
+        json={
+            "month": "2026-10",
+            "amount": 3000
+        }
+    )
+
+    assert create_response.status_code == 200
+
+    update_response = client.put(
+        "/api/budgets/2026-10",
+        json={
+            "amount": 5000
+        }
+    )
+
+    assert update_response.status_code == 200
+
+    data = update_response.json()
+
+    assert data["month"] == "2026-10"
+    assert data["amount"] == 5000
+
+
+def test_update_budget_not_found(client):
+    response = client.put(
+        "/api/budgets/2099-02",
+        json={
+            "amount": 5000
+        }
+    )
+
+    assert response.status_code == 404
+
+    assert response.json() == {
+        "detail": "该月份还没有设置预算"
+    }
+
+
+def test_budget_summary(client):
+    budget_response = client.post(
+        "/api/budgets",
+        json={
+            "month": "2026-11",
+            "amount": 1000
+        }
+    )
+
+    assert budget_response.status_code == 200
+
+    expenses = [
+        {
+            "date": "2026-11-01",
+            "item": "房租",
+            "amount": 500,
+            "category": "住房",
+            "payer": "A",
+            "note": ""
+        },
+        {
+            "date": "2026-11-10",
+            "item": "买菜",
+            "amount": 100,
+            "category": "食品",
+            "payer": "A",
+            "note": ""
+        },
+        {
+            "date": "2026-12-01",
+            "item": "十二月支出",
+            "amount": 300,
+            "category": "其他",
+            "payer": "A",
+            "note": ""
+        }
+    ]
+
+    for expense in expenses:
+        response = client.post(
+            "/api/expenses",
+            json=expense
+        )
+
+        assert response.status_code == 201
+
+    response = client.get(
+        "/api/budgets/2026-11/summary"
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["month"] == "2026-11"
+    assert data["budget"] == 1000
+    assert data["spent"] == 600
+    assert data["remaining"] == 400
+
+
+def test_budget_rejects_zero_amount(client):
+    response = client.post(
+        "/api/budgets",
+        json={
+            "month": "2026-12",
+            "amount": 0
+        }
+    )
+
+    assert response.status_code == 422

@@ -3,36 +3,53 @@ const api = {
   async getHealth() {
 
     const response =
-      await fetch("/api/health");
+      await fetch(
+        "/api/health"
+      );
+
 
     return this.handleResponse(
       response
     );
+
   },
 
 
+
   async getExpenses(
+
     keyword = "",
+
     category = "",
+
     payer = "",
+
     sortBy = "date",
+
     sortOrder = "desc",
+
     page = 1,
+
     pageSize = 10
+
   ) {
 
     const params =
       new URLSearchParams();
 
 
+
     const cleanedKeyword =
       keyword.trim();
+
 
     const cleanedCategory =
       category.trim();
 
+
     const cleanedPayer =
       payer.trim();
+
 
 
     if (cleanedKeyword) {
@@ -41,7 +58,9 @@ const api = {
         "keyword",
         cleanedKeyword
       );
+
     }
+
 
 
     if (cleanedCategory) {
@@ -50,7 +69,9 @@ const api = {
         "category",
         cleanedCategory
       );
+
     }
+
 
 
     if (cleanedPayer) {
@@ -59,7 +80,9 @@ const api = {
         "payer",
         cleanedPayer
       );
+
     }
+
 
 
     params.set(
@@ -67,15 +90,18 @@ const api = {
       sortBy
     );
 
+
     params.set(
       "sort_order",
       sortOrder
     );
 
+
     params.set(
       "page",
       String(page)
     );
+
 
     params.set(
       "page_size",
@@ -83,10 +109,14 @@ const api = {
     );
 
 
+
     const response =
       await fetch(
+
         `/api/expenses?${params.toString()}`
+
       );
+
 
 
     const items =
@@ -95,156 +125,383 @@ const api = {
       );
 
 
+
     const total =
       Number(
+
         response.headers.get(
           "X-Total-Count"
-        ) ?? items.length
+        )
+
+        ?? items.length
+
       );
+
+
 
     const totalPages =
       Number(
+
         response.headers.get(
           "X-Total-Pages"
-        ) ?? 1
+        )
+
+        ?? 1
+
       );
+
+
 
     const currentPage =
       Number(
+
         response.headers.get(
           "X-Page"
-        ) ?? page
+        )
+
+        ?? page
+
       );
+
+
 
     const currentPageSize =
       Number(
+
         response.headers.get(
           "X-Page-Size"
-        ) ?? pageSize
+        )
+
+        ?? pageSize
+
       );
 
 
+
     return {
+
       items,
+
       total,
+
       totalPages,
-      page: currentPage,
-      pageSize: currentPageSize
+
+      page:
+        currentPage,
+
+      pageSize:
+        currentPageSize
+
     };
+
   },
+
 
 
   async createExpense(payload) {
 
     const response =
       await fetch(
+
         "/api/expenses",
+
         {
-          method: "POST",
+
+          method:
+            "POST",
+
 
           headers: {
+
             "Content-Type":
               "application/json"
+
           },
 
+
           body:
-            JSON.stringify(payload)
+
+            JSON.stringify(
+              payload
+            )
+
         }
+
       );
+
 
     return this.handleResponse(
       response
     );
+
   },
+
 
 
   async updateExpense(
+
     expenseId,
+
     payload
+
   ) {
 
     const response =
       await fetch(
+
         `/api/expenses/${expenseId}`,
+
         {
-          method: "PUT",
+
+          method:
+            "PUT",
+
 
           headers: {
+
             "Content-Type":
               "application/json"
+
           },
 
+
           body:
-            JSON.stringify(payload)
+
+            JSON.stringify(
+              payload
+            )
+
         }
+
       );
+
 
     return this.handleResponse(
       response
     );
+
   },
+
 
 
   async deleteExpense(
+
     expenseId
+
   ) {
 
     const response =
       await fetch(
+
         `/api/expenses/${expenseId}`,
+
         {
-          method: "DELETE"
+
+          method:
+            "DELETE"
+
         }
+
       );
+
 
     return this.handleResponse(
       response
     );
+
   },
+
 
 
   async getMonthSummary(month) {
 
     const response =
       await fetch(
+
         `/api/summary/month?month=${encodeURIComponent(month)}`
+
       );
+
 
     return this.handleResponse(
       response
     );
+
   },
+
 
 
   async getCategorySummary() {
 
     const response =
       await fetch(
+
         "/api/summary/category"
+
       );
+
 
     return this.handleResponse(
       response
     );
+
   },
+
 
 
   async getPayerSummary() {
 
     const response =
       await fetch(
+
         "/api/summary/payer"
+
       );
+
 
     return this.handleResponse(
       response
     );
+
   },
 
 
+
+  /* ================================= */
+  /* Budget API */
+  /* ================================= */
+
+  async getBudget(month) {
+
+    const response =
+      await fetch(
+
+        `/api/budgets/${encodeURIComponent(month)}`
+
+      );
+
+
+    return this.handleResponse(
+      response
+    );
+
+  },
+
+
+
+  async getBudgetSummary(month) {
+
+    const response =
+      await fetch(
+
+        `/api/budgets/${encodeURIComponent(month)}/summary`
+
+      );
+
+
+    return this.handleResponse(
+      response
+    );
+
+  },
+
+
+
+  async createBudget(payload) {
+
+    const response =
+      await fetch(
+
+        "/api/budgets",
+
+        {
+
+          method:
+            "POST",
+
+
+          headers: {
+
+            "Content-Type":
+              "application/json"
+
+          },
+
+
+          body:
+
+            JSON.stringify(
+              payload
+            )
+
+        }
+
+      );
+
+
+    return this.handleResponse(
+      response
+    );
+
+  },
+
+
+
+  async updateBudget(
+
+    month,
+
+    payload
+
+  ) {
+
+    const response =
+      await fetch(
+
+        `/api/budgets/${encodeURIComponent(month)}`,
+
+        {
+
+          method:
+            "PUT",
+
+
+          headers: {
+
+            "Content-Type":
+              "application/json"
+
+          },
+
+
+          body:
+
+            JSON.stringify(
+              payload
+            )
+
+        }
+
+      );
+
+
+    return this.handleResponse(
+      response
+    );
+
+  },
+
+
+
+  /* ================================= */
+  /* 统一处理响应 */
+  /* ================================= */
+
   async handleResponse(response) {
 
-    let data = null;
+    let data =
+      null;
+
 
 
     try {
@@ -252,10 +509,15 @@ const api = {
       data =
         await response.json();
 
-    } catch {
-
-      data = {};
     }
+
+    catch {
+
+      data =
+        {};
+
+    }
+
 
 
     if (!response.ok) {
@@ -264,36 +526,75 @@ const api = {
         "请求失败";
 
 
+
       if (
+
         typeof data.detail ===
         "string"
+
       ) {
 
         message =
           data.detail;
+
       }
 
+
       else if (
-        Array.isArray(data.detail)
+
+        Array.isArray(
+          data.detail
+        )
+
       ) {
 
         message =
           data.detail
+
             .map(
+
               (error) =>
                 error.msg
+
             )
-            .join("；");
+
+            .join(
+              "；"
+            );
+
       }
 
 
-      throw new Error(
-        message
-      );
+
+      const error =
+        new Error(
+          message
+        );
+
+
+      /*
+        保存 HTTP 状态码。
+
+        比如：
+        404 = 这个月份还没有预算
+
+        app.js 会根据这个状态码
+        判断到底是正常的“没有预算”
+        还是服务器真的出错。
+      */
+
+      error.status =
+        response.status;
+
+
+      throw error;
+
     }
 
 
+
     return data;
+
   }
 
 };

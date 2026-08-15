@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from app.database import create_db_and_tables, get_session
-from app.models import Expense, ExpenseCreate
+from app.models import Expense, ExpenseCreate, Budget, BudgetCreate, BudgetSummary,BudgetUpdate
 
 async def lifespan(app: FastAPI):
     create_db_and_tables()
@@ -285,3 +285,102 @@ def summary_by_payer(
 @app.get("/", include_in_schema=False)
 def serve_home():
     return FileResponse("frontend/index.html")
+
+@app.post("/api/budgets", response_model=Budget)
+def create_budget(
+    budget_data: BudgetCreate,
+    session: Session = Depends(get_session)
+):
+    existing_budget = session.exec(
+        select(Budget).where(Budget.month == budget_data.month)
+    ).first()
+
+    if existing_budget:
+        raise HTTPException(
+            status_code=400,
+            detail="该月份已经设置过预算"
+        )
+
+    budget = Budget(
+        month=budget_data.month,
+        amount=budget_data.amount
+    )
+
+    session.add(budget)
+    session.commit()
+    session.refresh(budget)
+
+    return budget
+
+@app.get("/api/budgets/{month}", response_model=Budget)
+def get_budget(
+    month: str,
+    session: Session = Depends(get_session)
+):
+    budget = session.exec(
+        select(Budget).where(Budget.month == month)
+    ).first()
+
+    if not budget:
+        raise HTTPException(
+            status_code=404,
+            detail="该月份还没有设置预算"
+        )
+
+    return budget
+
+@app.get("/api/budgets/{month}/summary", response_model=BudgetSummary)
+def get_budget_summary(
+    month: str,
+    session: Session = Depends(get_session)
+):
+    budget = session.exec(
+        select(Budget).where(Budget.month == month)
+    ).first()
+
+    if not budget:
+        raise HTTPException(
+            status_code=404,
+            detail="该月份还没有设置预算"
+        )
+
+    expenses = session.exec(select(Expense)).all()
+
+    spent = sum(
+        expense.amount
+        for expense in expenses
+        if expense.date.strftime("%Y-%m") == month
+    )
+
+    remaining = budget.amount - spent
+
+    return BudgetSummary(
+        month=month,
+        budget=budget.amount,
+        spent=spent,
+        remaining=remaining
+    )
+
+@app.put("/api/budgets/{month}", response_model=Budget)
+def update_budget(
+    month: str,
+    budget_data: BudgetUpdate,
+    session: Session = Depends(get_session)
+):
+    budget = session.exec(
+        select(Budget).where(Budget.month == month)
+    ).first()
+
+    if not budget:
+        raise HTTPException(
+            status_code=404,
+            detail="该月份还没有设置预算"
+        )
+
+    budget.amount = budget_data.amount
+
+    session.add(budget)
+    session.commit()
+    session.refresh(budget)
+
+    return budget
